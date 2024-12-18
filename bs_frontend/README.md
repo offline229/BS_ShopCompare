@@ -1,23 +1,20 @@
-# bs_frontend
+# frontend
 
-This template should help get you started developing with Vue 3 in Vite.
 
-## Recommended IDE Setup
+views 存放页面
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+router 文件夹下的index.js文件存储路由信息
 
-## Type Support for `.vue` Imports in TS
+store 文件下的index.js文件存储静态变量信息
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
+component 存放组件
 
 ## Project Setup
 
 ```sh
 npm install
+npm install axios
+
 ```
 
 ### Compile and Hot-Reload for Development

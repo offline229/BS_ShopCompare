@@ -1,23 +1,49 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+
+// 页面导入
+import HomePage from '@/views/HomePage.vue';
+import RegisterPage from '@/views/RegisterPage.vue';
+import PasswordChangePage from '@/views/PasswordChangePage.vue';
+import SearchPage from '@/views/SearchPage.vue';
+import TestView from  '@/views/TestView.vue'
+import LoginPage from '@/views/LoginPage.vue';
+
+const routes = [
+  {
+    path: '/',
+    name: 'Home',
+    component: HomePage,
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: RegisterPage,
+  },
+  {
+    path: '/password-change',
+    name: 'PasswordChange',
+    component: PasswordChangePage,
+  },
+  {
+    path: '/search',
+    name: 'Search',
+    component: SearchPage,
+  },
+  {
+    path: '/test',
+    name: 'Test',
+    component: TestView,
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: LoginPage,
+  },
+];
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: HomeView,
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
-    },
-  ],
-})
+  history: createWebHistory(),
+  routes,
+});
 
-export default router
+export default router;
