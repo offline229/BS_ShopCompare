@@ -97,16 +97,35 @@ const form = ref({
 const router = useRouter();
 
 // 错误提示
-const usernameError = ref(false);
-const passwordError = ref(false);
-const confirmPasswordError = ref(false);
+const usernameError = ref('');
+const passwordError = ref('');
+const confirmPasswordError = ref('');
+const captchaError = ref('');
 
 // 用户名和密码校验
 const validateForm = () => {
-  usernameError.value = form.value.username.length < 6;
-  passwordError.value = form.value.password.length < 6;
-  confirmPasswordError.value = form.value.password !== form.value.confirmPassword;
+  // 清空错误信息
+  usernameError.value = '';
+  passwordError.value = '';
+  confirmPasswordError.value = '';
+  captchaError.value = '';
 
+  // 用户名校验
+  if (form.value.username.length < 6) {
+    usernameError.value = '用户名必须至少6个字符';
+  }
+
+  // 密码校验
+  if (form.value.password.length < 6) {
+    passwordError.value = '密码必须至少6个字符';
+  }
+
+  // 确认密码校验
+  if (form.value.password !== form.value.confirmPassword) {
+    confirmPasswordError.value = '密码和确认密码不一致';
+  }
+
+  // 返回是否有错误
   return !(usernameError.value || passwordError.value || confirmPasswordError.value);
 };
 
@@ -141,20 +160,29 @@ const sendCaptcha = async () => {
     }
     console.error(error);
   }
-
 };
 
 // 处理表单提交
 const handleSubmit = async () => {
+  // 校验表单
   if (!validateForm()) {
-    alert('请修正表单中的错误');
-    return;
-  }
-
-  // 校验验证码是否为空
-  if (!form.value.captcha) {
-    alert('请输入验证码');
-    return;
+    // 逐个输出具体错误信息
+    if (usernameError.value) {
+      alert(usernameError.value);  // 提示用户名错误
+      return;
+    }
+    if (passwordError.value) {
+      alert(passwordError.value);  // 提示密码错误
+      return;
+    }
+    if (confirmPasswordError.value) {
+      alert(confirmPasswordError.value);  // 提示确认密码错误
+      return;
+    }
+    if (!form.value.captcha) {
+      alert('请输入验证码');
+      return;
+    }
   }
 
   try {
@@ -166,19 +194,28 @@ const handleSubmit = async () => {
       captcha: form.value.captcha
     });
 
-    if (response.data.success) {
+    if (response.status === 200 && response.data.success) {
       alert('注册成功');
-      router.push('/');  // 注册成功，跳转到首页
-    } else if (response.data.message === 'Invalid captcha') {
-      alert('验证码错误');
+      await router.push('/');  // 注册成功，跳转到首页
     } else {
-      alert('注册失败：' + response.data.message);
+      // 详细错误信息
+      alert('注册失败：' + (response.data.message || '未知错误'));
     }
   } catch (error) {
-    alert('请求失败，请稍后再试');
+    if (error.response) {
+      // 如果后端返回了响应数据，且状态码为400等
+      alert('请求失败: ' + (error.response.data || '未知错误'));  // 显示后端返回的错误信息
+    } else if (error.request) {
+      // 如果请求没有响应，表示没有收到服务器的回应
+      alert('请求失败: 网络错误');
+    } else {
+      // 其他错误
+      alert('请求失败: ' + error.message);
+    }
     console.error(error);
   }
 };
+
 </script>
 
 
