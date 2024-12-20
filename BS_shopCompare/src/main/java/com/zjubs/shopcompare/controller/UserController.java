@@ -1,45 +1,26 @@
 package com.zjubs.shopcompare.controller;
 
-import com.zjubs.shopcompare.model.User;
-import com.zjubs.shopcompare.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-
-    @Autowired
-    private UserRepository userRepository;  // 用于查询用户信息
-
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder; // 用于密码加密和验证
-
     @PostMapping("/login")
     public String login(@RequestBody LoginRequest loginRequest) {
-        // 1. 验证邮箱是否存在
-        User user = userRepository.findByEmail(loginRequest.getEmail());
-        if (user == null) {
-            logger.warn("用户未找到，邮箱: " + loginRequest.getEmail());
-            return "用户未找到";
-        }
+        // 假设有一个LoginRequest类来接收前端的请求体
+        System.out.println("收到的请求数据: ");
+        System.out.println("Email: " + loginRequest.getEmail());
+        System.out.println("Password: " + loginRequest.getPassword());
+        logger.info("收到的请求：Email = " + loginRequest.getEmail() + ", Password = " + loginRequest.getPassword());
+        // 此处进行认证（可以是数据库验证、JWT生成等）
 
-        // 2. 验证密码是否正确
-        if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            logger.info("登录成功，用户邮箱: " + loginRequest.getEmail());
-            return "登录成功";
-        } else {
-            logger.warn("密码错误，邮箱: " + loginRequest.getEmail());
-            return "密码错误";
-        }
+        // 返回登录成功的响应
+        return "登录成功";
     }
 }
-
-// LoginRequest 用于接收前端传过来的数据
 class LoginRequest {
     private String email;
     private String password;
