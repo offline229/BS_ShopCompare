@@ -84,6 +84,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import TopBar from '@/components/TopBar.vue';
+import axios from 'axios';
 
 const form = ref({
   username: '',
@@ -110,40 +111,76 @@ const validateForm = () => {
 };
 
 // 发送验证码
-const sendCaptcha = () => {
+const sendCaptcha = async () => {
   // 校验邮箱格式
   if (!form.value.email) {
     alert('请输入有效的邮箱');
     return;
   }
 
-  // 请求后端发送验证码
-  console.log('验证码请求发送至邮箱:', form.value.email);
-  // 这里可以加入实际的后端请求逻辑，发送验证码到用户邮箱
-  // 例如：axios.post('/api/send-captcha', { email: form.value.email });
-  alert('验证码已发送到邮箱');
+  try {
+    // 发送请求到后端，传递邮箱地址
+    const response = await axios.post('/api/users/send-captcha', { email: form.value.email });
+
+    if (response.status === 200) {  // 200 OK 表示请求成功
+      alert('验证码已发送到邮箱');
+    } else {
+      // 其他情况，使用返回的 message 显示错误信息
+      alert('验证码发送失败：' + response.data);
+    }
+  } catch (error) {
+    if (error.response) {
+      // 如果后端返回了响应数据，且状态码为400等
+      alert('请求失败: ' + error.response.data);  // 显示后端返回的错误信息
+    } else if (error.request) {
+      // 如果请求没有响应，表示没有收到服务器的回应
+      alert('请求失败: 网络错误');
+    } else {
+      // 其他错误
+      alert('请求失败: ' + error.message);
+    }
+    console.error(error);
+  }
+
 };
 
 // 处理表单提交
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (!validateForm()) {
     alert('请修正表单中的错误');
     return;
   }
 
-  // 模拟注册请求
-  console.log('注册请求数据:', form.value);
+  // 校验验证码是否为空
+  if (!form.value.captcha) {
+    alert('请输入验证码');
+    return;
+  }
 
-  // 假设注册成功，跳转到首页
-  const isSuccess = true; // 模拟成功
-  if (isSuccess) {
-    alert('注册成功');
-    router.push('/');  // 注册成功，跳转到首页
-  } else {
-    alert('注册失败，请稍后再试');
+  try {
+    // 发送注册请求到后端，包含用户名、密码、邮箱和验证码
+    const response = await axios.post('/api/users/register', {
+      username: form.value.username,
+      password: form.value.password,
+      email: form.value.email,
+      captcha: form.value.captcha
+    });
+
+    if (response.data.success) {
+      alert('注册成功');
+      router.push('/');  // 注册成功，跳转到首页
+    } else if (response.data.message === 'Invalid captcha') {
+      alert('验证码错误');
+    } else {
+      alert('注册失败：' + response.data.message);
+    }
+  } catch (error) {
+    alert('请求失败，请稍后再试');
+    console.error(error);
   }
 };
 </script>
+
 
 <style scoped>
 .register-page {
