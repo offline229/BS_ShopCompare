@@ -53,17 +53,46 @@ const form = ref({
   password: ''
 });
 
+// 获取 router
 const router = useRouter();
 
 // 模拟登录请求
 const handleLogin = async () => {
   if (form.value.email && form.value.password) {
     console.log('登录请求:', form.value);
-    const loginSuccess = true; // 模拟成功的登录
-    if (loginSuccess) {
-      router.push('/');
-    } else {
-      alert('登录失败，请检查邮箱和密码');
+
+    // 获取当前用户输入的 email 和 password
+    const email = form.value.email;
+    const password = form.value.password;
+    console.log('Email:', email);
+    console.log('Password:', password);
+
+    // 发送登录请求到后端
+    try {
+      const response = await fetch('http://localhost:8000/api/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
+
+      const data = await response.text();
+      console.log('后端返回:', data);
+
+      if (response.ok) {
+        // 如果登录成功，跳转到首页
+        router.push('/');
+      } else {
+        // 如果登录失败，弹出提示
+        alert('登录失败，请检查邮箱和密码');
+      }
+    } catch (error) {
+      console.error('登录请求出错:', error);
+      alert('请求失败，请稍后再试');
     }
   } else {
     alert('请输入有效的邮箱和密码');
@@ -75,6 +104,10 @@ const goToRegister = () => {
   router.push('/register');
 };
 </script>
+
+
+
+
 
 <style scoped>
 /* 顶栏样式 */
