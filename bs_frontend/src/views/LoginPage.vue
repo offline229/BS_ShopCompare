@@ -46,6 +46,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import TopBar from '@/components/TopBar.vue';
+import { useUserStore } from '@/stores/userStore';
 
 // 定义表单数据
 const form = ref({
@@ -55,8 +56,10 @@ const form = ref({
 
 // 获取 router
 const router = useRouter();
+// 获取 userStore
+const userStore = useUserStore();
 
-// 模拟登录请求
+
 const handleLogin = async () => {
   if (form.value.email && form.value.password) {
     console.log('登录请求:', form.value);
@@ -84,11 +87,15 @@ const handleLogin = async () => {
       console.log('后端返回:', data);
 
       if (response.ok) {
-        // 如果登录成功，跳转到首页
-        router.push('/');
+        // 登录成功后，存储用户名到 Pinia store
+        userStore.setUser(data);  // 假设后端返回的是用户名
+        alert('登录成功');
+        console.log('当前存储的数据:', data);
+        console.log('当前存储的用户 ID:', userStore.getUserId());
+        router.push('/');  // 跳转到首页
       } else {
-        // 如果登录失败，弹出提示
-        alert('登录失败，请检查邮箱和密码');
+        // 登录失败，弹出后端返回的错误信息
+        alert('登录失败: ' + data);  // 显示具体错误原因
       }
     } catch (error) {
       console.error('登录请求出错:', error);
@@ -103,6 +110,8 @@ const handleLogin = async () => {
 const goToRegister = () => {
   router.push('/register');
 };
+
+
 </script>
 
 

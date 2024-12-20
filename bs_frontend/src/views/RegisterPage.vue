@@ -85,7 +85,6 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import TopBar from '@/components/TopBar.vue';
 
-// 定义表单数据
 const form = ref({
   username: '',
   password: '',
@@ -96,16 +95,39 @@ const form = ref({
 
 const router = useRouter();
 
-// 模拟发送验证码
+// 错误提示
+const usernameError = ref(false);
+const passwordError = ref(false);
+const confirmPasswordError = ref(false);
+
+// 用户名和密码校验
+const validateForm = () => {
+  usernameError.value = form.value.username.length < 6;
+  passwordError.value = form.value.password.length < 6;
+  confirmPasswordError.value = form.value.password !== form.value.confirmPassword;
+
+  return !(usernameError.value || passwordError.value || confirmPasswordError.value);
+};
+
+// 发送验证码
 const sendCaptcha = () => {
-  // 这里可以加入实际的验证码发送逻辑
-  console.log('验证码已发送');
+  // 校验邮箱格式
+  if (!form.value.email) {
+    alert('请输入有效的邮箱');
+    return;
+  }
+
+  // 请求后端发送验证码
+  console.log('验证码请求发送至邮箱:', form.value.email);
+  // 这里可以加入实际的后端请求逻辑，发送验证码到用户邮箱
+  // 例如：axios.post('/api/send-captcha', { email: form.value.email });
+  alert('验证码已发送到邮箱');
 };
 
 // 处理表单提交
 const handleSubmit = () => {
-  if (form.value.password !== form.value.confirmPassword) {
-    alert('密码和确认密码不一致');
+  if (!validateForm()) {
+    alert('请修正表单中的错误');
     return;
   }
 
@@ -115,7 +137,8 @@ const handleSubmit = () => {
   // 假设注册成功，跳转到首页
   const isSuccess = true; // 模拟成功
   if (isSuccess) {
-    router.push('/'); // 注册成功，跳转到首页
+    alert('注册成功');
+    router.push('/');  // 注册成功，跳转到首页
   } else {
     alert('注册失败，请稍后再试');
   }
