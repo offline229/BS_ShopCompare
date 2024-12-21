@@ -139,7 +139,10 @@ const sendCaptcha = async () => {
 
   try {
     // 发送请求到后端，传递邮箱地址
-    const response = await axios.post('/api/users/send-captcha', { email: form.value.email });
+    const response = await axios.post('/api/users/send-captcha', {
+      email: form.value.email,
+      username: form.value.username
+    });
 
     if (response.status === 200) {  // 200 OK 表示请求成功
       alert('验证码已发送到邮箱');
@@ -186,33 +189,17 @@ const handleSubmit = async () => {
   }
 
   try {
-    // 发送注册请求到后端，包含用户名、密码、邮箱和验证码
     const response = await axios.post('/api/users/register', {
+      email: form.value.email,
       username: form.value.username,
       password: form.value.password,
-      email: form.value.email,
-      captcha: form.value.captcha
+      captcha: form.value.captcha,
     });
 
-    if (response.status === 200 && response.data.success) {
-      alert('注册成功');
-      await router.push('/');  // 注册成功，跳转到首页
-    } else {
-      // 详细错误信息
-      alert('注册失败：' + (response.data.message || '未知错误'));
-    }
+    alert(response.data);  // 如果成功，显示 "注册成功"
+    router.push('/');  // 跳转到登录页面或首页
   } catch (error) {
-    if (error.response) {
-      // 如果后端返回了响应数据，且状态码为400等
-      alert('请求失败: ' + (error.response.data || '未知错误'));  // 显示后端返回的错误信息
-    } else if (error.request) {
-      // 如果请求没有响应，表示没有收到服务器的回应
-      alert('请求失败: 网络错误');
-    } else {
-      // 其他错误
-      alert('请求失败: ' + error.message);
-    }
-    console.error(error);
+    alert('注册失败: ' + error.response.data);
   }
 };
 

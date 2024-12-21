@@ -2,6 +2,8 @@ package com.zjubs.shopcompare.controller;
 
 import com.zjubs.shopcompare.model.User;
 import com.zjubs.shopcompare.repository.UserRepository;
+import com.zjubs.shopcompare.service.RedisService;
+import com.zjubs.shopcompare.util.CaptchaUtil;
 import com.zjubs.shopcompare.util.EmailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,8 @@ public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
+    @Autowired
+    private RedisService redisService;
     @Autowired
     private UserRepository userRepository;  // 用于查询用户信息
 
@@ -66,18 +70,25 @@ public class UserController {
             logger.info("该邮箱已注册: " + sendCaptchaRequest.getEmail());
             return new ResponseEntity<>("该邮箱已注册", HttpStatus.BAD_REQUEST);
         }
+        userFromDb = userRepository.findByUsername(sendCaptchaRequest.getUsername());
+        if (userFromDb.isPresent()) {
+            logger.info("该用户名已被注册: " + sendCaptchaRequest.getUsername());
+            return new ResponseEntity<>("该用户名已被注册", HttpStatus.BAD_REQUEST);
+        }
+
 
         // 发送验证码邮件
         try {
             String email = sendCaptchaRequest.getEmail();
             String subject = "注册验证码";
-            String captchaCode = "123456"; // 这里假设验证码为123456，实际应用中应该生成随机验证码
-            String text = "您的验证码是：" + captchaCode;
+            String captcha = CaptchaUtil.generateCaptcha();
+            String text = "您的验证码是：" + captcha + "，有效期五分钟。";
 
             // 调用EmailUtil发送邮件
             emailUtil.sendEmail(email, subject, text);
-            logger.info("验证码已发送到邮箱: " + email);
-
+            System.out.println("发送验证码至邮箱 " + email + "：验证码是 " + captcha);
+            // 保存验证码到 Redis 中
+            redisService.saveCaptcha(email, captcha);
             // 直接返回成功的响应信息
             return new ResponseEntity<>("验证码已发送到邮箱", HttpStatus.OK);
         } catch (Exception e) {
@@ -90,18 +101,23 @@ public class UserController {
     // 注册接口
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterRequest registerRequest) {
-        logger.info("收到的注册请求数据: ");
-        logger.info("Email: " + registerRequest.getEmail());
-        logger.info("Password: " + registerRequest.getPassword());
-        logger.info("Captcha: " + registerRequest.getCaptcha());  // 如果验证码也传递过来
-
-        // 假设验证码验证成功
-        if (!"123456".equals(registerRequest.getCaptcha())) {  // 比较验证码，这里是直接比对
-            logger.info("验证码错误: " + registerRequest.getCaptcha());
-            return new ResponseEntity<>("验证码错误", HttpStatus.BAD_REQUEST);
+        String email = registerRequest.getEmail();
+        String captcha = registerRequest.getCaptcha();
+        // 获取 Redis 中的验证码
+        String storedCaptcha = redisService.getCaptcha(email);
+        // 校验验证码
+        if (storedCaptcha == null || !storedCaptcha.equals(captcha)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("验证码无效或已过期");
         }
-
         // 假设验证码正确，进行注册逻辑（这里只是简单打印，实际可以在数据库中保存用户信息）
+        redisService.deleteCaptcha(email);
+
+        User newUser = new User();
+        newUser.setEmail(email);
+        newUser.setUsername(registerRequest.getUsername());
+        newUser.setPassword(registerRequest.getPassword()); // 需要加密密码
+        userRepository.save(newUser);
+
         logger.info("注册成功，用户名: " + registerRequest.getEmail());
         return new ResponseEntity<>("注册成功", HttpStatus.OK);
     }
@@ -109,6 +125,7 @@ public class UserController {
 
 class SendCaptchaRequest {
     private String email;
+    private String username;  // 添加 username 字段
 
     // Getter 和 Setter
     public String getEmail() {
@@ -118,12 +135,22 @@ class SendCaptchaRequest {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }
+
 
 class RegisterRequest {
     private String email;
     private String password;
     private String captcha;
+    private String username;
 
     // Getter 和 Setter
     public String getEmail() {
@@ -148,6 +175,14 @@ class RegisterRequest {
 
     public void setCaptcha(String captcha) {
         this.captcha = captcha;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }
 
