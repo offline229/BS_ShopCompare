@@ -1,16 +1,20 @@
 <template>
   <div class="product-card">
-    <img :src="product.image" alt="Product Image" class="product-image" />
+    <!-- 显示商品图片 -->
+    <img v-if="productImageUrl" :src="productImageUrl" alt="Product Image" class="product-image" />
+    <!-- 默认图片 -->
+    <img v-else :src="defaultImage" alt="Product Image" class="product-image" />
+
     <div class="product-details">
       <h3 class="product-name">{{ product.name }}</h3>
-      <p class="product-price">￥{{ product.price }}</p>
+      <p class="product-latestPrice">￥{{ product.latestPrice }}</p>
       <p class="product-platform">平台：{{ product.platform }}</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue';
+import { defineProps, ref, onMounted } from 'vue';
 
 // 接收商品数据作为 prop
 const props = defineProps({
@@ -18,12 +22,37 @@ const props = defineProps({
     type: Object,
     required: true,
     default: () => ({
-      image: '@/assets/seperate.png', // 默认商品图片
-      name: '商品A',  // 默认商品名称
-      price: 99.99,  // 默认商品价格
-      platform: '平台A',  // 默认平台
+      id: null,              // 商品ID
+      name: '蓝牙音响',       // 商品名称
+      category: '音响设备',    // 商品分类
+      latestPrice: 299,      // 商品价格
+      platform: '苏宁易购',  // 商品平台
+      image: null,           // 商品图片，建议使用图片链接或者 Blob 数据
+      shopUrl: '',           // 商品的购买链接
     }),
   },
+});
+
+// 存储图片的 Blob 数据的 URL
+const productImageUrl = ref<string | null>(null);
+
+// 默认图片（如果没有图片或加载失败时使用）
+const defaultImage = '@/assets/seperate.png';
+
+// 当商品数据变化时处理图片
+onMounted(() => {
+  if (props.product.image) {
+    // 如果是 base64 编码的图片
+    if (props.product.image.startsWith('data:image')) {
+      productImageUrl.value = props.product.image; // 直接使用 base64 字符串
+    } else if (props.product.image instanceof Blob) {
+      console.log("receive blob");
+      productImageUrl.value = URL.createObjectURL(props.product.image); // 处理 Blob 数据
+    }
+  } else {
+    // 如果没有图片，使用默认图片
+    productImageUrl.value = defaultImage;
+  }
 });
 </script>
 
@@ -59,7 +88,7 @@ const props = defineProps({
   margin: 0;
 }
 
-.product-price {
+.product-latestPrice {
   font-size: 16px;
   color: #ff7243;
   margin: 5px 0;
