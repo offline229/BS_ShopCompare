@@ -31,9 +31,10 @@ const products = ref(defaultProducts); // 商品数据
 // 向后端请求数据的函数
 const fetchProductData = async () => {
   try {
+    console.log("发送请求到后端")
     // 模拟请求商品展示数据 API（替换为实际的后端接口）
-    const response = await axios.get('/api/products');
-
+    const response = await axios.get('/api/products/latest');
+    console.log("response"+response.data);
     // 如果后端返回数据，使用后端数据更新商品列表
     if (response.data && response.data.products) {
       products.value = response.data.products;
