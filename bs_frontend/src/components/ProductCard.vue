@@ -39,10 +39,10 @@ const defaultImage = '@/assets/seperate.png';  // 如果没有图片，使用默
 
 // 监听商品数据变化，重新处理图片
 watch(() => props.product, (newProduct) => {
-  console.log("Product data updated:", newProduct);
+  // console.log("Product data updated:", newProduct);
 
   if (newProduct.img) {
-    console.log("Received image data:", newProduct.img);
+    // console.log("Received image data:", newProduct.img);
 
     // 将收到的 img 字符串直接转换为 Blob 对象
     const byteCharacters = atob(newProduct.img);  // 解码 Base64 字符串
@@ -60,10 +60,10 @@ watch(() => props.product, (newProduct) => {
 
     const blob = new Blob(byteArrays, { type: 'image/jpeg' }); // 假设图片格式为 'image/jpeg'
     productImageUrl.value = URL.createObjectURL(blob); // 使用 Blob 创建一个 URL 来展示
-    console.log("Converted image URL:", productImageUrl.value);
+    // console.log("Converted image URL:", productImageUrl.value);
 
   } else {
-    console.log("No product img found, using default img.");
+    // console.log("No product img found, using default img.");
     productImageUrl.value = defaultImage;  // 如果没有图片，使用默认图片
   }
 

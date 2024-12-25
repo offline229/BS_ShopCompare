@@ -5,6 +5,9 @@ import com.zjubs.shopcompare.model.PriceHistory;
 import com.zjubs.shopcompare.repository.ProductRepository;
 import com.zjubs.shopcompare.repository.PriceHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,19 +22,37 @@ public class ProductService {
     @Autowired
     private PriceHistoryRepository priceHistoryRepository;
 
-    public List<Product> getLatestProductsWithPrice() {
-        // 查询最新的前2条商品
-        List<Product> products = productRepository.findTop2ByOrderByCreatedAtDesc();
+    /**
+     * 获取最新商品数据（分页）并包含最新价格
+     * @param page 页码，从0开始
+     * @param size 每页的商品数量
+     * @return 商品列表
+     */
+    public List<Product> getLatestProductsWithPrice(int page, int size) {
+        // 创建分页请求对象
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 查询商品数据（分页）
+        Page<Product> productPage = productRepository.findAllByOrderByCreatedAtDesc(pageable);
 
         // 为每个商品添加最新价格
-        for (Product product : products) {
+        List<Product> productsWithPrice = productPage.getContent().stream().map(product -> {
+            // 获取该商品的最新价格
             List<PriceHistory> priceHistoryList = priceHistoryRepository.findTop1ByProductIdOrderByCreatedAtDesc(product.getId());
             if (!priceHistoryList.isEmpty()) {
-                // 设置最新价格
+                // 设置商品的最新价格
                 product.setLatestPrice(priceHistoryList.get(0).getPrice());
             }
-        }
+            return product;
+        }).collect(Collectors.toList());
 
-        return products;
+        return productsWithPrice;
+    }
+    /**
+     * 获取商品的总条目数
+     * @return 商品的总数量
+     */
+    public long getTotalProductCount() {
+        return productRepository.count();  // 返回商品的总数量
     }
 }
