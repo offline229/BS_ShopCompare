@@ -1,20 +1,18 @@
 <template>
   <div class="product-card">
-    <!-- 显示商品图片 -->
-    <img v-if="productImageUrl" :src="productImageUrl" alt="Product Image" class="product-image" />
-    <!-- 默认图片 -->
-    <img v-else :src="defaultImage" alt="Product Image" class="product-image" />
-
+    <!-- 直接绑定图片的 src -->
+    <img :src="productImageUrl" alt="Product Image" class="product-image" />
     <div class="product-details">
       <h3 class="product-name">{{ product.name }}</h3>
       <p class="product-latestPrice">￥{{ product.latestPrice }}</p>
       <p class="product-platform">平台：{{ product.platform }}</p>
     </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, onMounted } from 'vue';
+import { defineProps, ref, onMounted, watch } from 'vue';
 
 // 接收商品数据作为 prop
 const props = defineProps({
@@ -27,7 +25,7 @@ const props = defineProps({
       category: '音响设备',    // 商品分类
       latestPrice: 299,      // 商品价格
       platform: '苏宁易购',  // 商品平台
-      image: null,           // 商品图片，建议使用图片链接或者 Blob 数据
+      img: null,           // 商品图片，可能是 Blob 或 null
       shopUrl: '',           // 商品的购买链接
     }),
   },
@@ -36,25 +34,43 @@ const props = defineProps({
 // 存储图片的 Blob 数据的 URL
 const productImageUrl = ref<string | null>(null);
 
-// 默认图片（如果没有图片或加载失败时使用）
-const defaultImage = '@/assets/seperate.png';
+// 默认图片路径
+const defaultImage = '@/assets/seperate.png';  // 如果没有图片，使用默认图片路径
 
-// 当商品数据变化时处理图片
-onMounted(() => {
-  if (props.product.image) {
-    // 如果是 base64 编码的图片
-    if (props.product.image.startsWith('data:image')) {
-      productImageUrl.value = props.product.image; // 直接使用 base64 字符串
-    } else if (props.product.image instanceof Blob) {
-      console.log("receive blob");
-      productImageUrl.value = URL.createObjectURL(props.product.image); // 处理 Blob 数据
+// 监听商品数据变化，重新处理图片
+watch(() => props.product, (newProduct) => {
+  console.log("Product data updated:", newProduct);
+
+  if (newProduct.img) {
+    console.log("Received image data:", newProduct.img);
+
+    // 将收到的 img 字符串直接转换为 Blob 对象
+    const byteCharacters = atob(newProduct.img);  // 解码 Base64 字符串
+    const byteArrays = [];
+
+    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+      const slice = byteCharacters.slice(offset, offset + 512);
+      const byteNumbers = new Array(slice.length);
+      for (let i = 0; i < slice.length; i++) {
+        byteNumbers[i] = slice.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      byteArrays.push(byteArray);
     }
+
+    const blob = new Blob(byteArrays, { type: 'image/jpeg' }); // 假设图片格式为 'image/jpeg'
+    productImageUrl.value = URL.createObjectURL(blob); // 使用 Blob 创建一个 URL 来展示
+    console.log("Converted image URL:", productImageUrl.value);
+
   } else {
-    // 如果没有图片，使用默认图片
-    productImageUrl.value = defaultImage;
+    console.log("No product img found, using default img.");
+    productImageUrl.value = defaultImage;  // 如果没有图片，使用默认图片
   }
-});
+
+}, { immediate: true });  // immediate: true 确保初始时也会执行一次
+
 </script>
+
 
 <style scoped>
 .product-card {

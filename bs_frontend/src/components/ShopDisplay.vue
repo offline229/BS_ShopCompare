@@ -8,7 +8,7 @@
 
     <!-- 商品列表 -->
     <div class="product-list">
-      <ProductCard v-for="(product, index) in products" :key="index" :product="product" />
+      <ProductCard v-for="(product, index) in products" :key="product.id" :product="product" />
     </div>
   </div>
 </template>
@@ -26,7 +26,7 @@ const defaultProducts = [
     category: "电子产品",
     latestPrice: 399,
     platform: "京东",
-    image: "https://example.com/image1.jpg",  // 示例图片链接
+    img: null,  // 示例图片链接
     shopUrl: "https://jd.com/product/1"
   },
   {
@@ -35,7 +35,7 @@ const defaultProducts = [
     category: "音响设备",
     latestPrice: 199,
     platform: "淘宝",
-    image: "https://example.com/image2.jpg",  // 示例图片链接
+    img: null,  // 示例图片链接
     shopUrl: "https://taobao.com/product/2"
   },
   {
@@ -44,7 +44,7 @@ const defaultProducts = [
     category: "电脑配件",
     latestPrice: 149,
     platform: "天猫",
-    image: "https://example.com/image3.jpg",  // 示例图片链接
+    img: null,  // 示例图片链接
     shopUrl: "https://tmall.com/product/3"
   },
   {
@@ -53,9 +53,9 @@ const defaultProducts = [
     category: "音响设备",
     latestPrice: 299,
     platform: "苏宁易购",
-    image: "https://example.com/image4.jpg",  // 示例图片链接
+    img: null,  // 示例图片链接
     shopUrl: "https://suning.com/product/4"
-  }
+  },
 ];
 
 const products = ref(defaultProducts); // 商品数据
@@ -111,11 +111,7 @@ onMounted(() => {
   font-size: 24px;
 }
 
-.logo {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-}
+
 
 .product-list {
   display: flex;
@@ -123,4 +119,10 @@ onMounted(() => {
   justify-content: space-around;
   margin-top: 20px;
 }
+.logo {
+  width: 150px;   /* 设置图片宽度 */
+  height: auto;   /* 高度自适应 */
+  object-fit: contain; /* 确保图片不被裁剪 */
+}
+
 </style>
