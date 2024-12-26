@@ -7,6 +7,7 @@ import PasswordChangePage from '@/views/PasswordChangePage.vue';
 import SearchPage from '@/views/SearchPage.vue';
 import TestView from  '@/views/TestView.vue'
 import LoginPage from '@/views/LoginPage.vue';
+import ProfilePage from "@/views/ProfilePage.vue";
 
 const routes = [
   {
@@ -38,6 +39,11 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: LoginPage,
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: ProfilePage,
   },
 ];
 

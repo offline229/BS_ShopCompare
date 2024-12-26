@@ -2,7 +2,7 @@
   <div class="shop-display">
     <!-- 顶栏 -->
     <div class="header">
-      <h2 class="title">商品展示 共有 {{ totalCount }} 个商品</h2>
+      <h2 class="title">商品库存 共有 {{ totalCount }} 个</h2>
       <img src="@/assets/seperate.png" alt="logo" class="logo" />
     </div>
     <!-- 商品列表 -->

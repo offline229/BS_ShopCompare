@@ -1,15 +1,18 @@
 <template>
   <div class="product-card">
     <!-- 商品图片 -->
-    <img :src="productImageUrl" alt="Product Image" class="product-image" />
-
+    <a :href="product.shopUrl" target="_blank">
+      <img :src="productImageUrl" alt="Product Image" class="product-image" />
+    </a>
+    <p class="product-link-text">点击跳转到对应商品页</p>
     <div class="product-details">
       <h3 class="product-name">{{ product.name }}</h3>
       <p class="product-latestPrice">￥{{ product.latestPrice }}</p>
 
       <div class="product-meta">
         <!-- 平台信息和按钮同一行 -->
-        <p class="product-platform">{{ product.platform }}</p>
+        <span class="product-platform">{{ product.platform }}</span> |
+        <span class="product-category">{{ product.category }}</span>
 
         <!-- 时钟按钮 -->
         <button class="icon-button" @click="openClockModal">
@@ -121,6 +124,13 @@ watch(() => props.product, (newProduct) => {
   height: 200px;
   object-fit: cover;
 }
+.product-link-text {
+  font-size: 12px;         /* 设置小字大小 */
+  color: #888888;          /* 设置淡灰色 */
+  margin-top: 5px;         /* 与图片之间的间距 */
+  text-align: center;      /* 居中显示 */
+}
+
 
 .product-details {
   padding: 10px;
@@ -144,6 +154,12 @@ watch(() => props.product, (newProduct) => {
   color: #666;
   margin-right: auto;
 }
+.product-category {
+  font-size: 14px;
+  color: #666;
+  margin-right: auto;
+  transform: translateX(-10px);
+}
 
 .product-meta {
   display: flex;
@@ -161,5 +177,14 @@ watch(() => props.product, (newProduct) => {
   width: 20px;  /* 调整按钮图标大小 */
   height: 20px;
 }
+
+/* 禁用链接的默认样式 */
+a {
+  text-decoration: none;
+  outline: none;
+  background: none;
+}
+
+
 
 </style>

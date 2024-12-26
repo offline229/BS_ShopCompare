@@ -116,4 +116,33 @@ public class PriceAlertService {
             }
         }
     }
+
+
+    // 获取用户的提醒记录
+    public List<PriceAlert> getPriceAlertsForUser(int userId) {
+        System.out.println("检查 getPriceAlertsForUser 方法，传入的 userId: " + userId);
+
+        // 调用 repository 方法并获取结果
+        List<PriceAlert> alerts = priceAlertRepository.findAlertsByUserId(userId);
+
+        // 打印查询结果
+        if (alerts != null && !alerts.isEmpty()) {
+            System.out.println("找到的提醒记录数量: " + alerts.size());
+            for (PriceAlert alert : alerts) {
+                System.out.println("提醒记录 - ID: " + alert.getId() + ", 用户ID: " + alert.getUserId() +
+                        ", 商品ID: " + alert.getProductId() +
+                        ", 价格阈值: " + alert.getPriceThreshold());
+            }
+        } else {
+            System.out.println("没有找到任何提醒记录.");
+        }
+
+        return alerts;
+    }
+    // 删除提醒记录
+    public boolean deletePriceAlert(int Id) {
+        // 删除记录的逻辑
+        int deletedCount = priceAlertRepository.deleteById(Id);
+        return deletedCount > 0;
+    }
 }

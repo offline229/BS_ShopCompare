@@ -12,6 +12,7 @@
     <div class="right">
       <div v-if="isLoggedIn" class="user-info">
         <span class="username">欢迎您, {{ username }}</span>
+        <button @click="goToProfile" class="profile-button">个人主页</button>
         <button @click="logout" class="logout-button">退出登录</button>
       </div>
       <div v-else>
@@ -21,6 +22,7 @@
     </div>
   </header>
 </template>
+
 
 <script setup lang="ts">
 import { computed } from 'vue';
@@ -42,6 +44,11 @@ const logout = () => {
 // 跳转到登录页面
 const redirectToLogin = () => {
   router.push('/login');
+};
+
+// 跳转到个人主页
+const goToProfile = () => {
+  router.push('/profile');  // 假设你的个人主页路由为 `/profile`
 };
 </script>
 
@@ -92,7 +99,8 @@ const redirectToLogin = () => {
 }
 
 .logout-button,
-.login-button {
+.login-button,
+.profile-button {
   background-color: white;
   color: #FF7243;
   border: none;
@@ -103,7 +111,9 @@ const redirectToLogin = () => {
 }
 
 .logout-button:hover,
-.login-button:hover {
+.login-button:hover,
+.profile-button:hover {
   background-color: #ffe6e1;
 }
 </style>
+
