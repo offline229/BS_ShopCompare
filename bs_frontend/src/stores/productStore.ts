@@ -7,6 +7,34 @@ export const useProductStore = defineStore('product', () => {
     const categoryFilter = ref('');
     const currentPage = ref(1);
     const itemsPerPage = ref(8);
+    // 新增状态：当前商品的 ID 和弹窗的显示状态
+    const currentProductId = ref<number | null>(null);  // 当前请求商品的 ID
+    const showClockModal = ref(false);  // 定时消息弹窗是否可见
+    const showChartModal = ref(false);  // 图表展示弹窗是否可见
+
+    // 更新当前商品 ID 的方法
+    const updateCurrentProductId = (id: number) => {
+        currentProductId.value = id;
+    };
+
+
+    // 更新弹窗可见性的方法
+    const updateShowClockModal = (isVisible: boolean) => {
+        showClockModal.value = isVisible;
+    };
+
+    const updateShowChartModal = (isVisible: boolean) => {
+        showChartModal.value = isVisible;
+    };
+
+    // 使用 computed 来创建 getter 和 setter（如果需要的话）
+    const currentProductIdValue = computed({
+        get: () => currentProductId.value,  // 获取当前商品 ID
+        set: (value: number | null) => {
+            currentProductId.value = value;  // 设置新的商品 ID
+        }
+    });
+
 
     // 更新 searchQuery 的方法
     const updateSearchQuery = (query: string) => {
@@ -62,9 +90,17 @@ export const useProductStore = defineStore('product', () => {
         updateSearchQuery,
         updateCategoryFilter,
         updatePagination,
-        searchQueryValue,  // 返回计算属性
-        categoryFilterValue,  // 返回计算属性
-        currentPageValue,  // 返回计算属性
-        itemsPerPageValue  // 返回计算属性
+        searchQueryValue,
+        categoryFilterValue,
+        currentPageValue,
+        itemsPerPageValue,
+
+        // 新增的部分
+        currentProductId,
+        showClockModal,
+        showChartModal,
+        updateCurrentProductId,
+        updateShowClockModal,
+        updateShowChartModal
     };
 });
