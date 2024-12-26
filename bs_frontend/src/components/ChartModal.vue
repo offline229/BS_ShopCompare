@@ -154,6 +154,8 @@ onMounted(() => {
 
 .modal-content h2 {
   margin-bottom: 20px;
+  font-weight: bold;  /* 设置加粗 */
+  color: black;       /* 设置为黑色 */
 }
 
 .modal-content button {

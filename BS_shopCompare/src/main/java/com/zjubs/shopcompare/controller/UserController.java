@@ -1,5 +1,6 @@
 package com.zjubs.shopcompare.controller;
 
+import com.zjubs.shopcompare.model.PriceAlert;
 import com.zjubs.shopcompare.model.User;
 import com.zjubs.shopcompare.repository.UserRepository;
 import com.zjubs.shopcompare.service.RedisService;
@@ -11,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import com.zjubs.shopcompare.service.PriceAlertService;
 import java.util.Optional;
 
 @RestController
@@ -121,6 +122,32 @@ public class UserController {
         logger.info("注册成功，用户名: " + registerRequest.getEmail());
         return new ResponseEntity<>("注册成功", HttpStatus.OK);
     }
+
+
+    @Autowired
+    private PriceAlertService priceAlertService;
+
+    // 设置商品价格提醒接口
+    @PostMapping("/set_alarm")
+    public ResponseEntity<String> setPriceAlert(@RequestBody SetAlarmRequest setAlarmRequest) {
+        // 获取前端传递的用户名和商品ID
+        String username = setAlarmRequest.getUsername();
+        int productId = setAlarmRequest.getProductId();
+        logger.info("接收到设置价格提醒请求：用户名 = {}, 商品ID = {}", username, productId);
+
+        // 根据用户名查找用户ID
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        User user = userOptional.get();
+        int userId = user.getId();  // 获取用户ID
+
+        // 调用服务层保存价格提醒
+        try {
+            priceAlertService.setPriceAlert(userId, productId);
+            return new ResponseEntity<>("价格提醒设置成功", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("设置价格提醒失败", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
 
 class SendCaptchaRequest {
@@ -205,5 +232,27 @@ class LoginRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+}
+
+class SetAlarmRequest {
+    private String username;  // 用户名
+    private int productId;    // 商品ID
+
+    // Getter 和 Setter
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public int getProductId() {
+        return productId;
+    }
+
+    public void setProductId(int productId) {
+        this.productId = productId;
     }
 }
