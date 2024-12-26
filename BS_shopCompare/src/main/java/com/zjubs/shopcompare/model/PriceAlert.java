@@ -14,6 +14,7 @@ public class PriceAlert {
 
     private int userId;  // 用户 ID
     private int productId;  // 商品 ID
+    private double priceThreshold;  // 价格阈值
 
     // Getters and Setters
     public int getId() {
@@ -38,5 +39,13 @@ public class PriceAlert {
 
     public void setProductId(int productId) {
         this.productId = productId;
+    }
+
+    public double getPriceThreshold() {
+        return priceThreshold;
+    }
+
+    public void setPriceThreshold(double priceThreshold) {
+        this.priceThreshold = priceThreshold;
     }
 }
