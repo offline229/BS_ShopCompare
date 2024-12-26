@@ -49,7 +49,7 @@ const fetchProductData = async () => {
     console.log("itemsPerPage: ", itemsPerPage);
     console.log("currentPage: ", currentPage);
     // 向后端请求数据，带上分页参数
-    const response = await axios.post('/api/products/latest', {
+    const response = await axios.post('/api/products/shop_display', {
       page: currentPage.value,
       limit: itemsPerPage.value
     });

@@ -32,4 +32,8 @@ export const useUserStore = defineStore('user', () => {
         getUserId,
         getLoginStatus
     };
+}, {
+    persist: {
+        storage: sessionStorage,  // 使用 sessionStorage 保存数据
+    },
 });

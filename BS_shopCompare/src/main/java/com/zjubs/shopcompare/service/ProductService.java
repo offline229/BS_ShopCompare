@@ -55,4 +55,10 @@ public class ProductService {
     public long getTotalProductCount() {
         return productRepository.count();  // 返回商品的总数量
     }
+
+    // 获取商品的历史价格数据
+    public List<PriceHistory> getProductHistoryPrice(int productId) {
+        // 查询数据库中对应商品 ID 的历史价格
+        return priceHistoryRepository.findByProductId(productId);
+    }
 }

@@ -9,4 +9,6 @@ public interface PriceHistoryRepository extends JpaRepository<PriceHistory, Inte
 
     // 查询某个商品的最新价格
     List<PriceHistory> findTop1ByProductIdOrderByCreatedAtDesc(int productId);
+
+    List<PriceHistory> findByProductId(int product_id);
 }

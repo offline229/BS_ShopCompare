@@ -1,5 +1,6 @@
 package com.zjubs.shopcompare.controller;
 
+import com.zjubs.shopcompare.model.PriceHistory;
 import com.zjubs.shopcompare.model.Product;
 import com.zjubs.shopcompare.service.ProductService;
 import org.slf4j.Logger;
@@ -20,7 +21,7 @@ public class ProductController {
     private ProductService productService;
 
     // 获取最新商品数据的接口，支持分页
-    @PostMapping("/api/products/latest")
+    @PostMapping("/api/products/shop_display")
     public Map<String, Object> getLatestProducts(@RequestBody ProductRequest request) {
         // 记录收到请求的日志，输出分页参数
         logger.info("收到商品请求：查询最新商品数据，页码：{}, 每页数量：{}", request.getPage(), request.getLimit());
@@ -52,6 +53,32 @@ public class ProductController {
 
         return response;  // 返回Map类型，包含商品列表和总数量
     }
+
+    @PostMapping("/api/products/history_price")
+    public Map<String, Object> getProductHistoryPrice(@RequestBody ProductHistoryRequest request) {
+        // 记录收到请求的日志，输出商品ID
+        logger.info("收到商品请求：查询商品历史价格，商品ID：{}", request.getProductId());
+
+        // 调用服务层获取商品的历史价格数据
+        List<PriceHistory> historyPrices = productService.getProductHistoryPrice(request.getProductId());
+
+        // 输出查询结果的日志
+        for (PriceHistory history : historyPrices) {
+            logger.info("商品ID: {}, 日期: {}, 历史价格: {}",
+                    history.getProduct().getId(),
+                    history.getCreatedAt(),
+                    history.getPrice());
+        }
+
+        logger.info("查询到的历史价格记录数量: {}", historyPrices.size());
+
+        // 将历史价格列表封装到一个Map中返回
+        Map<String, Object> response = new HashMap<>();
+        response.put("historyPrices", historyPrices);
+
+        return response;  // 返回Map类型，包含历史价格记录
+    }
+
 }
 class ProductRequest {
 
@@ -73,5 +100,19 @@ class ProductRequest {
 
     public void setLimit(int limit) {
         this.limit = limit;
+    }
+}
+
+class ProductHistoryRequest {
+
+    private int productId;  // 商品 ID
+
+    // Getter 和 Setter
+    public int getProductId() {
+        return productId;
+    }
+
+    public void setProductId(int productId) {
+        this.productId = productId;
     }
 }
