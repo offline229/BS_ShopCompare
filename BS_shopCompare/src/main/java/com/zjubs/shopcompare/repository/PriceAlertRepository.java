@@ -10,5 +10,5 @@ public interface PriceAlertRepository extends JpaRepository<PriceAlert, Integer>
     List<PriceAlert> findAlertsByUserId(int userId);
 
     // 根据用户ID和提醒ID删除记录
-    int deleteById(int Id);
+    void deleteById(int Id);
 }

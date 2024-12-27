@@ -134,8 +134,15 @@ public class PriceAlertService {
     }
     // 删除提醒记录
     public boolean deletePriceAlert(int Id) {
-        // 删除记录的逻辑
-        int deletedCount = priceAlertRepository.deleteById(Id);
-        return deletedCount > 0;
+        try {
+            System.out.println("开始删除");
+            priceAlertRepository.deleteById(Id);
+            System.out.println("删除完毕");
+            return true;
+        } catch (Exception e) {
+            // 捕获任何异常并打印堆栈信息
+            e.printStackTrace();
+            return false;
+        }
     }
 }

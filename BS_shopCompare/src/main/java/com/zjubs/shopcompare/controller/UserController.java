@@ -1,8 +1,7 @@
 package com.zjubs.shopcompare.controller;
 
-import com.zjubs.shopcompare.model.PriceAlert;
-import com.zjubs.shopcompare.model.PriceHistory;
-import com.zjubs.shopcompare.model.User;
+import com.zjubs.shopcompare.model.*;
+import com.zjubs.shopcompare.repository.ProductRepository;
 import com.zjubs.shopcompare.repository.UserRepository;
 import com.zjubs.shopcompare.service.RedisService;
 import com.zjubs.shopcompare.util.CaptchaUtil;
@@ -15,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.zjubs.shopcompare.service.PriceAlertService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +28,9 @@ public class UserController {
     private RedisService redisService;
     @Autowired
     private UserRepository userRepository;  // 用于查询用户信息
+
+    @Autowired
+    private ProductRepository productRepository;
 
     @Autowired
     private EmailUtil emailUtil;  // 注入 EmailUtil 发送邮件
@@ -158,21 +161,43 @@ public class UserController {
         String username = request.getUsername(); // 前端传来的是 username
         try {
             Optional<User> userOptional = userRepository.findByUsername(username);
+            if (!userOptional.isPresent()) {
+                return new ResponseEntity<>("用户不存在", HttpStatus.NOT_FOUND);
+            }
+
             User user = userOptional.get();
             int userId = user.getId();  // 获取用户ID
             System.out.println("检查" + userId);
 
             // 调用 PriceAlertService 获取指定用户的提醒记录
             List<PriceAlert> alerts = priceAlertService.getPriceAlertsForUser(userId);
-            for (PriceAlert alert : alerts) {
-                logger.info("查看 用户ID: {}, 商品ID: {}, ID: {}", alert.getUserId(), alert.getProductId(), alert.getId());
-            }
-
             if (alerts == null || alerts.isEmpty()) {
                 return new ResponseEntity<>("没有找到提醒记录", HttpStatus.NOT_FOUND);
             }
-            return new ResponseEntity<>(alerts, HttpStatus.OK);
+
+            // 获取产品信息并将产品信息添加到结果中
+            List<PriceAlertWithProductInfo> alertsWithProductInfo = new ArrayList<>();
+            for (PriceAlert alert : alerts) {
+                logger.info("查看 用户ID: {}, 商品ID: {}, ID: {}", alert.getUserId(), alert.getProductId(), alert.getId());
+
+                // 根据产品ID查询产品信息
+                Optional<Product> productOptional = productRepository.findById(alert.getProductId());
+                if (productOptional.isPresent()) {
+                    Product product = productOptional.get();
+
+                    // 将价格提醒和产品信息封装在一起
+                    PriceAlertWithProductInfo alertWithProductInfo = new PriceAlertWithProductInfo(alert, product);
+                    alertsWithProductInfo.add(alertWithProductInfo);
+                } else {
+                    logger.warn("没有找到商品ID: {} 的产品信息", alert.getProductId());
+                }
+            }
+
+            // 返回包含价格提醒和产品信息的列表
+            return new ResponseEntity<>(alertsWithProductInfo, HttpStatus.OK);
+
         } catch (Exception e) {
+            logger.error("获取提醒记录失败", e);
             return new ResponseEntity<>("获取提醒记录失败", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -181,11 +206,14 @@ public class UserController {
     @DeleteMapping("/delete_alert")
     public ResponseEntity<String> deleteAlert(@RequestBody DeleteAlertRequest request) {
         int id = request.getId();
+        System.out.println("check " + id);
 
         try {
             // 调用 PriceAlertService 删除提醒记录
             boolean deleted = priceAlertService.deletePriceAlert(id);
+            System.out.println("check deleted" + deleted);
             if (deleted) {
+                System.out.println("successfully deleted");
                 return new ResponseEntity<>("提醒已删除", HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("删除失败，未找到记录", HttpStatus.BAD_REQUEST);

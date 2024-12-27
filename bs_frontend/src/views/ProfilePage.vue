@@ -21,10 +21,10 @@
           </thead>
           <tbody>
           <tr v-for="alert in alerts" :key="alert.id">
-            <td>{{ alert.productName }}</td>
-            <td>￥{{ alert.priceThreshold }}</td>
+            <td>{{ alert.product.name }}</td> <!-- 显示产品名称 -->
+            <td>￥{{ alert.priceAlert.priceThreshold }}</td> <!-- 显示提醒价格 -->
             <td>
-              <button @click="cancelAlert(alert.id)" class="cancel-alert-button">取消提醒</button>
+              <button @click="cancelAlert(alert.priceAlert.id)" class="cancel-alert-button">取消提醒</button>
             </td>
           </tr>
           </tbody>
@@ -64,31 +64,29 @@ const fetchAlerts = async () => {
     const response = await axios.post('/api/users/personal_alert', {
       username: userId //Id实际上是名字
     });
-    console.log('check'+response);
+    console.log(response.data);
     if (response.data) {
-      console.log('check1');
       alerts.value = response.data; // 设置提醒记录
     } else {
+      alerts.value = ([]);
       console.error("没有找到提醒记录");
     }
   } catch (error) {
-    console.error("获取提醒记录失败", error);
+    alerts.value = ([]);
   }
 };
-
 
 // 取消提醒
 const cancelAlert = async (alertId: number) => {
   try {
+    console.log("check"+alertId);
     const response = await axios.delete(`/api/users/delete_alert`, {
-      data: { userId }
+      data: { id: alertId  }
     });
-    if (response.data.success) {
-      // 删除成功后重新获取数据
-      fetchAlerts();
-    } else {
-      console.error("取消提醒失败");
-    }
+
+
+    fetchAlerts();
+
   } catch (error) {
     console.error("删除提醒失败", error);
   }

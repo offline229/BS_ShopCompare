@@ -12,6 +12,7 @@
     <div class="right">
       <div v-if="isLoggedIn" class="user-info">
         <span class="username">欢迎您, {{ username }}</span>
+        <button @click="goToHome" class="home-button">回到首页</button>
         <button @click="goToProfile" class="profile-button">个人主页</button>
         <button @click="logout" class="logout-button">退出登录</button>
       </div>
@@ -48,7 +49,12 @@ const redirectToLogin = () => {
 
 // 跳转到个人主页
 const goToProfile = () => {
-  router.push('/profile');  // 假设你的个人主页路由为 `/profile`
+  router.push('/profile');
+};
+
+// 跳转到个人主页
+const goToHome = () => {
+  router.push('/');
 };
 </script>
 
@@ -100,6 +106,7 @@ const goToProfile = () => {
 
 .logout-button,
 .login-button,
+.home-button,
 .profile-button {
   background-color: white;
   color: #FF7243;
@@ -110,6 +117,8 @@ const goToProfile = () => {
   margin-left: 10px;
 }
 
+
+.home-button:hover,
 .logout-button:hover,
 .login-button:hover,
 .profile-button:hover {
