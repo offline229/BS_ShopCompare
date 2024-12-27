@@ -35,7 +35,7 @@ def get_driver():
     edge_driver_path = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedgedriver.exe"
     service = Service(edge_driver_path)
     edge_options = Options()
-    edge_options.add_argument('--headless')  # 启用无头模式
+    edge_options.add_argument('--headless=old')  # 启用无头模式
     edge_options.add_argument('--disable-gpu')  # 禁用 GPU 加速
     edge_options.add_argument('--no-sandbox')  # 解决 Linux 系统兼容性问题
 

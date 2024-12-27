@@ -21,19 +21,17 @@
       <select v-model="localPlatform">
         <option value="苏宁易购">苏宁易购</option>
         <option value="尚兴">尚兴</option>
-        <!-- 可以根据需求继续添加其他平台 -->
       </select>
+    </div>
+
+    <!-- 启用本地搜索模式切换按钮 -->
+    <div class="category">
+      <button @click="toggleLocalSearch">{{ localSearchButtonText }}</button>
     </div>
 
     <!-- 确定筛选按钮 -->
     <div class="category">
-      <button @click="applyFilters">确定筛选</button>
-    </div>
-
-    <!-- Debug信息显示 -->
-    <div class="debug-info">
-      <h3 class="category-title">Debug 信息</h3>
-      <pre>{{ debugInfo }}</pre>
+      <button @click="applyFilters">点击筛选</button>
     </div>
   </aside>
 </template>
@@ -50,23 +48,20 @@ const localPriceMax = ref<number | null>(null);
 const localPriceSort = ref<'asc' | 'desc'>('asc'); // 默认升序
 const localPlatform = ref<string>('苏宁易购');
 
-// Debug信息
-const debugInfo = computed(() => {
-  return {
-    searchQuery: productStore.searchQuery,
-    currentPage: productStore.currentPage,
-    itemsPerPage: productStore.itemsPerPage,
-    priceMin: productStore.priceMin,
-    priceMax: productStore.priceMax,
-    platform: productStore.platform,
-    priceSort: productStore.priceSort,
-  };
-});
-
 // 切换价格排序
 const togglePriceSort = () => {
   localPriceSort.value = localPriceSort.value === 'asc' ? 'desc' : 'asc';
 };
+
+// 切换本地搜索模式
+const toggleLocalSearch = () => {
+  productStore.toggleLocalSearch(!productStore.isLocalSearchEnabled);
+};
+
+// 获取本地搜索按钮的文本
+const localSearchButtonText = computed(() => {
+  return productStore.isLocalSearchEnabled ? '爬虫搜索模式' : '本地搜索模式';
+});
 
 // 更新筛选条件到 store
 const applyFilters = () => {
@@ -76,25 +71,22 @@ const applyFilters = () => {
   productStore.updatePriceSort(localPriceSort.value);
   productStore.updatePlatform(localPlatform.value);
 
-  // 你可以根据需要，也可以更新搜索查询（如果需要更新）
-  // productStore.updateSearchQuery(newSearchQuery);
-
   // 如果需要更新分页或其他筛选项，可以在这里进行
   // productStore.updateCurrentPage(1);  // 默认从第一页开始
 };
 </script>
 
-
 <style scoped>
 .sidebar {
   width: 250px;
   background-color: white;
-  padding: 15px;
+  padding: 20px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   height: 100vh;
   position: fixed;
   top: 60px;
   left: 0;
+  border-radius: 8px;
 }
 
 .category {
@@ -104,25 +96,8 @@ const applyFilters = () => {
 .category-title {
   font-size: 18px;
   font-weight: bold;
-  cursor: pointer;
   color: #333;
-}
-
-.subcategory-list {
-  list-style: none;
-  padding-left: 20px;
-  font-size: 16px;
-  color: #666;
-}
-
-.subcategory-list li {
-  padding: 5px 0;
-  cursor: pointer;
-}
-
-.subcategory-list li:hover {
-  background-color: #f0f0f0;
-  border-radius: 5px;
+  margin-bottom: 10px;
 }
 
 .price-filter {
@@ -132,41 +107,58 @@ const applyFilters = () => {
 }
 
 .price-filter input {
-  padding: 5px;
+  padding: 8px;
   font-size: 14px;
-  width: 80px;
+  width: 90px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #f7f7f7;
 }
 
 button {
-  padding: 5px 10px;
+  padding: 8px 15px;
   margin-top: 10px;
   font-size: 14px;
-  background-color: #4caf50;
+  background-color: #FF7243;
   color: white;
   border: none;
   cursor: pointer;
-  border-radius: 4px;
-}
-
-button:hover {
-  background-color: #45a049;
-}
-
-select {
-  padding: 5px;
-  margin-top: 10px;
+  border-radius: 6px;
   width: 100%;
 }
 
-.debug-info {
-  margin-top: 30px;
-  background-color: #f9f9f9;
-  padding: 10px;
-  border-radius: 4px;
+button:hover {
+  background-color: #e85c33;
 }
 
-.debug-info pre {
-  font-size: 14px;
+select {
+  padding: 8px;
+  margin-top: 10px;
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #f7f7f7;
   color: #333;
+}
+
+select:focus {
+  border-color: #FF7243;
+  outline: none;
+}
+
+select option {
+  padding: 8px;
+}
+
+.category button {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
 }
 </style>

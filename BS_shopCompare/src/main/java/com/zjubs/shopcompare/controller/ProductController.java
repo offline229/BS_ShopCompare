@@ -30,8 +30,8 @@ public class ProductController {
         // 记录收到请求的日志，输出分页参数
         logger.info("收到商品请求：查询最新商品数据，页码：{}, 每页数量：{}", request.getPage(), request.getLimit());
         // 调用服务层获取分页后的商品数据
-        // 如果 searchQuery 不为空，且不是翻页请求，则调用 PythonSpiderService
-        if (request.getPage()!= 1 && request.getSearchQuery() != null && !request.getSearchQuery().trim().isEmpty()) {
+        // 如果 searchQuery 不为空，且不是翻页请求，且启用爬虫搜索，则调用 PythonSpiderService
+        if (!request.getIsLocalSearchEnabled() &&request.getPage()!= 1 && request.getSearchQuery() != null && !request.getSearchQuery().trim().isEmpty()) {
             // 调用 pythonSpiderService 的 callPythonSpider 方法
             String spiderResponse = pythonSpiderService.callPythonSpider(request.getSearchQuery());
 
@@ -39,6 +39,7 @@ public class ProductController {
             System.out.println("PythonSpider返回结果: " + spiderResponse);
 
         }
+        // 如果搜索为空或是翻页请求或没启用爬虫搜索
         List<Product> products = productService.getLatestProductsWithFilters(
                 request.getSearchQuery(),   // 搜索关键词
                 request.getPriceMin(),      // 最低价格
@@ -156,6 +157,7 @@ class ProductRequest {
     private Double priceMax;     // 最高价格
     private String platform;     // 平台
     private String priceSort;    // 价格排序（升序或降序）
+    private boolean isLocalSearchEnabled;
 
     // Getter 和 Setter
 
@@ -214,6 +216,15 @@ class ProductRequest {
     public void setPriceSort(String priceSort) {
         this.priceSort = priceSort;
     }
+
+    public boolean getIsLocalSearchEnabled() {
+        return isLocalSearchEnabled;
+    }
+
+    public void setIsLocalSearchEnabled(String priceSort) {
+        this.isLocalSearchEnabled = isLocalSearchEnabled;
+    }
+
 }
 
 

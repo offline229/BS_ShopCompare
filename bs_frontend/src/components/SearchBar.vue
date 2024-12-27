@@ -3,7 +3,7 @@
     <input
         v-model="localSearchQuery"
         type="text"
-        placeholder="请输入商品名称，并稍作等待"
+        placeholder="请输入商品名称，若使用爬虫请稍作等待"
         class="search-input"
         @input="onInput"
     />

@@ -53,6 +53,7 @@ const fetchProductData = async () => {
       priceMax: productStore.priceMax,
       platform: productStore.platform,
       priceSort: productStore.priceSort,
+      isLocalSearchEnabled : productStore.isLocalSearchEnabled,
     });
     // 向后端请求数据，带上分页参数
     const response = await axios.post('/api/products/shop_display', {
@@ -62,7 +63,8 @@ const fetchProductData = async () => {
       platform: productStore.platform,
       priceSort: productStore.priceSort,
       page: currentPage.value,
-      limit: itemsPerPage.value
+      limit: itemsPerPage.value,
+      isLocalSearchEnabled : productStore.isLocalSearchEnabled
     });
 
     // 假设后端返回的数据结构类似：

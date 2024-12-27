@@ -18,6 +18,9 @@ export const useProductStore = defineStore('product', () => {
     const platform = ref<string>('');  // 平台名
     const priceSort = ref<'asc' | 'desc'>('asc');  // 价格排序，默认为升序（'asc'）
 
+    // 新增状态：是否启动本地搜索的 flag
+    const isLocalSearchEnabled = ref<boolean>(false);  // 默认为 false，表示不启动本地搜索
+
     // 更新当前商品 ID 的方法
     const updateCurrentProductId = (id: number) => {
         currentProductId.value = id;
@@ -36,7 +39,6 @@ export const useProductStore = defineStore('product', () => {
     const updateSearchQuery = (query: string) => {
         searchQuery.value = query;
     };
-
 
     // 更新分页
     const updatePagination = (page: number, limit: number) => {
@@ -62,6 +64,11 @@ export const useProductStore = defineStore('product', () => {
     // 更新价格排序
     const updatePriceSort = (sortOrder: 'asc' | 'desc') => {
         priceSort.value = sortOrder;
+    };
+
+    // 启动/关闭本地搜索
+    const toggleLocalSearch = (isEnabled: boolean) => {
+        isLocalSearchEnabled.value = isEnabled;
     };
 
     // 使用 computed 来创建 getter 和 setter
@@ -124,6 +131,7 @@ export const useProductStore = defineStore('product', () => {
         priceMax,
         platform,
         priceSort,
+        isLocalSearchEnabled,  // 返回本地搜索 flag
 
         // 更新的方法
         updateSearchQuery,
@@ -132,6 +140,7 @@ export const useProductStore = defineStore('product', () => {
         updatePriceMax,
         updatePlatform,
         updatePriceSort,
+        toggleLocalSearch,  // 启动/关闭本地搜索的方法
 
         // computed getter 和 setter
         searchQueryValue,
