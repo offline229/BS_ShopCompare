@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from crawler_snyg import fetch_product_details  # 引入爬虫函数
+from crawler_snyg import crawl_interface  # 引入爬虫函数
 
 app = Flask(__name__)
 
@@ -15,7 +15,7 @@ def crawl():
 
     try:
         # 调用爬虫函数获取数据
-        result = fetch_product_details(keyword)
+        result = crawl_interface(keyword)
 
         # 如果爬取成功，返回 OK 信号
         if result:

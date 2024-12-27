@@ -30,6 +30,15 @@ public class ProductController {
         // 记录收到请求的日志，输出分页参数
         logger.info("收到商品请求：查询最新商品数据，页码：{}, 每页数量：{}", request.getPage(), request.getLimit());
         // 调用服务层获取分页后的商品数据
+        // 如果 searchQuery 不为空，且不是翻页请求，则调用 PythonSpiderService
+        if (request.getPage()!= 1 && request.getSearchQuery() != null && !request.getSearchQuery().trim().isEmpty()) {
+            // 调用 pythonSpiderService 的 callPythonSpider 方法
+            String spiderResponse = pythonSpiderService.callPythonSpider(request.getSearchQuery());
+
+            // 打印返回的内容
+            System.out.println("PythonSpider返回结果: " + spiderResponse);
+
+        }
         List<Product> products = productService.getLatestProductsWithFilters(
                 request.getSearchQuery(),   // 搜索关键词
                 request.getPriceMin(),      // 最低价格
@@ -41,6 +50,13 @@ public class ProductController {
         );
 
         long totalCount = productService.getTotalProductCount();
+        long searchCount = productService.getProductCountWithFilters(
+                request.getSearchQuery(),   // 搜索关键词
+                request.getPriceMin(),      // 最低价格
+                request.getPriceMax(),      // 最高价格
+                request.getPlatform()
+        );
+        System.out.println(searchCount);
         // 输出查询结果的日志
         for (Product product : products) {
             logger.info("商品ID: {}, 名称: {}, 类别: {}, 平台: {}, 创建时间: {}, 商店网址: {}, 最新价格: {}",
@@ -59,6 +75,7 @@ public class ProductController {
         Map<String, Object> response = new HashMap<>();
         response.put("products", products);
         response.put("totalCount", totalCount);
+        response.put("searchCount", searchCount);
 
         return response;  // 返回Map类型，包含商品列表和总数量
     }

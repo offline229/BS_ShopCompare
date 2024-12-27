@@ -2,7 +2,7 @@
   <div class="shop-display">
     <!-- 顶栏 -->
     <div class="header">
-      <h2 class="title">商品库存 共有 {{ totalCount }} 个</h2>
+      <h2 class="title">商品库存 共有 {{ totalCount }} 个 本次找到 {{ searchCount }}个</h2>
       <img src="@/assets/seperate.png" alt="logo" class="logo" />
     </div>
     <!-- 商品列表 -->
@@ -40,6 +40,8 @@ const itemsPerPage = computed(() => productStore.itemsPerPage);
 // 分页相关的状态
 const totalPages = ref(1);    // 总页数
 const totalCount = ref(0);    // 总商品数量
+const searchCount = ref(0);   // 搜索结果数量
+
 const products = ref([]); // 商品数据
 
 // 向后端请求数据的函数（支持分页）
@@ -54,7 +56,7 @@ const fetchProductData = async () => {
     });
     // 向后端请求数据，带上分页参数
     const response = await axios.post('/api/products/shop_display', {
-      searchQuery: null,
+      searchQuery: productStore.searchQuery,
       priceMin: productStore.priceMin,
       priceMax: productStore.priceMax,
       platform: productStore.platform,
@@ -67,13 +69,15 @@ const fetchProductData = async () => {
     // { products: [...], totalCount: 100 }
     const productsData = response.data.products;  // 获取商品列表
     const totalItems = response.data.totalCount;  // 获取总商品数量
+    const searchItems = response.data.searchCount;
 
     // 更新商品数据和总条目数
     products.value = productsData;
     totalCount.value = totalItems;
+    searchCount.value = searchItems;
 
     // 计算总页数
-    totalPages.value = Math.ceil(totalItems / itemsPerPage.value);
+    totalPages.value = Math.ceil(searchCount.value / itemsPerPage.value);
 
     // 输出调试信息
     console.log("Products: ", products.value);
@@ -84,6 +88,7 @@ const fetchProductData = async () => {
     // 如果请求失败，保持默认商品数据
     products.value = [];
     totalCount.value = 0;
+    searchCount.value = 0;
     totalPages.value = 1;
   }
 };
@@ -107,7 +112,7 @@ onMounted(() => {
 // 监听筛选条件的变化，当发生变化时，重新获取商品数据
 watch(
     [
-//      () => productStore.searchQuery,
+      () => productStore.searchQuery,
       () => productStore.priceMin,
       () => productStore.priceMax,
       () => productStore.platform,

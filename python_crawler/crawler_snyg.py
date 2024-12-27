@@ -282,7 +282,7 @@ def process_product(conn, product_info):
     if product_id is None:
         # 插入新的商品时，先处理价格
         # 处理价格，去掉 "¥" 和 "," 等非数字字符
-        latest_price = product_info['price'].replace('¥', '').replace(',', '')  # 去除 "¥" 和 "," 符号
+        latest_price = product_info['price'].replace('¥', '').replace(',', '').replace('到手价', '')  # 去除 "¥", "," 和 "到手价"
         try:
             latest_price = float(latest_price)  # 转换为浮动数值
         except ValueError:
@@ -304,23 +304,33 @@ def process_product(conn, product_info):
     os.remove(downloaded_image_path)
     logging.info(f"删除本地图片: {downloaded_image_path}")
 
-# 主函数，模拟爬取商品信息并处理
-def main():
-    # 示例查询关键词，可以根据需求更改
-    keyword = input("请输入商品关键词（例如: 猫粮）: ").strip()
-
+# 新增的函数 '调用'
+def crawl_interface(keyword):
     # 连接数据库
     conn = connect_db()
     if conn is None:
-        return
+        logging.error("无法连接到数据库")
+        return False  # 连接数据库失败时返回 False
 
     try:
         # 爬取商品信息
         products = fetch_product_details(keyword)
 
+        # 如果没有爬取到商品信息，返回失败
+        if not products:
+            logging.warning("未找到任何商品信息")
+            return False
+
         # 处理每个商品
         for product_info in products:
             process_product(conn, product_info)
+
+        # 如果一切顺利，返回成功
+        return True
+
+    except Exception as e:
+        logging.error(f"爬取或处理商品时发生错误: {e}")
+        return False
 
     finally:
         # 关闭数据库连接
@@ -328,5 +338,8 @@ def main():
             conn.close()
             logging.info("数据库连接已关闭")
 
+
+
 if __name__ == '__main__':
-    main()
+    keyword = input("请输入商品关键词（例如: 猫粮）: ").strip()
+    crawl_interface((keyword))

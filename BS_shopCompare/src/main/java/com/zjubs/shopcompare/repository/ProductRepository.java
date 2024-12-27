@@ -30,4 +30,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     // 使用 Specification 进行动态查询（已经由 JpaSpecificationExecutor 提供）
     Page<Product> findAll(Specification<Product> spec, Pageable pageable);
+
+    long count(Specification<Product> spec);
 }

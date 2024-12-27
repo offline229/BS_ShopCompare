@@ -6,7 +6,7 @@
     </a>
     <p class="product-link-text">点击跳转到对应商品页</p>
     <div class="product-details">
-      <h3 class="product-name">{{ product.name }}</h3>
+      <h3 class="product-name" :title="product.name">{{ product.name }}</h3>
       <p class="product-latestPrice">￥{{ product.latestPrice }}</p>
 
       <div class="product-meta">
@@ -141,6 +141,15 @@ watch(() => props.product, (newProduct) => {
   font-weight: bold;
   color: #333;
   margin: 0;
+
+  /* 允许换行 */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;  /* 设置显示2行 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  width: 100%; /* 占满父容器的宽度 */
 }
 
 .product-latestPrice {
