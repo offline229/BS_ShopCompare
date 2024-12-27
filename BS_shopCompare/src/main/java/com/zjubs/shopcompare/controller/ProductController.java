@@ -29,13 +29,18 @@ public class ProductController {
     public Map<String, Object> getLatestProducts(@RequestBody ProductRequest request) {
         // 记录收到请求的日志，输出分页参数
         logger.info("收到商品请求：查询最新商品数据，页码：{}, 每页数量：{}", request.getPage(), request.getLimit());
-
         // 调用服务层获取分页后的商品数据
-        List<Product> products = productService.getLatestProductsWithPrice(request.getPage(), request.getLimit());
+        List<Product> products = productService.getLatestProductsWithFilters(
+                request.getSearchQuery(),   // 搜索关键词
+                request.getPriceMin(),      // 最低价格
+                request.getPriceMax(),      // 最高价格
+                request.getPlatform(),      // 平台
+                request.getPriceSort(),     // 价格排序（升序或降序）
+                request.getPage(),         // 页码
+                request.getLimit()         // 每页数量
+        );
 
-        // 获取商品的总数量
         long totalCount = productService.getTotalProductCount();
-
         // 输出查询结果的日志
         for (Product product : products) {
             logger.info("商品ID: {}, 名称: {}, 类别: {}, 平台: {}, 创建时间: {}, 商店网址: {}, 最新价格: {}",
@@ -58,44 +63,7 @@ public class ProductController {
         return response;  // 返回Map类型，包含商品列表和总数量
     }
 
-    // 搜索新商品，支持分页
-    @PostMapping("/api/products/search")
-    public Map<String, Object> searchProducts(@RequestBody SearchProductRequest request) {
-        // 日志记录请求参数
-        logger.info("收到商品请求：查询商品数据，关键字：{}, 页码：{}, 每页数量：{}", request.getKeyword(), request.getPage(), request.getLimit());
 
-        // 调用爬虫服务获取商品数据
-        String isCrawlComplete  = pythonSpiderService.callPythonSpider(request.getKeyword());
-
-        System.out.println(isCrawlComplete);
-
-        // 调用服务层获取分页后的商品数据
-        List<Product> products = productService.getLatestProductsWithPrice(request.getPage(), request.getLimit());
-
-        // 获取商品的总数量
-        long totalCount = productService.getTotalProductCount();
-
-        // 输出查询结果的日志
-        for (Product product : products) {
-            logger.info("商品ID: {}, 名称: {}, 类别: {}, 平台: {}, 创建时间: {}, 商店网址: {}, 最新价格: {}",
-                    product.getId(),
-                    product.getName(),
-                    product.getCategory(),
-                    product.getPlatform(),
-                    product.getCreatedAt(),
-                    product.getShopUrl(),
-                    product.getLatestPrice());
-        }
-
-        logger.info("查询到的商品数量: {}", products.size());
-
-        // 将商品列表和总数量封装到一个Map中返回
-        Map<String, Object> response = new HashMap<>();
-        response.put("products", products);
-        response.put("totalCount", totalCount);
-
-        return response;
-    }
 
     // 获取某个商品的历史价格
     @PostMapping("/api/products/history_price")
@@ -166,8 +134,14 @@ class ProductRequest {
 
     private int page;
     private int limit;
+    private String searchQuery;  // 搜索关键字
+    private Double priceMin;     // 最低价格
+    private Double priceMax;     // 最高价格
+    private String platform;     // 平台
+    private String priceSort;    // 价格排序（升序或降序）
 
     // Getter 和 Setter
+
     public int getPage() {
         return page;
     }
@@ -183,7 +157,48 @@ class ProductRequest {
     public void setLimit(int limit) {
         this.limit = limit;
     }
+
+    public String getSearchQuery() {
+        return searchQuery;
+    }
+
+    public void setSearchQuery(String searchQuery) {
+        this.searchQuery = searchQuery;
+    }
+
+    public Double getPriceMin() {
+        return priceMin;
+    }
+
+    public void setPriceMin(Double priceMin) {
+        this.priceMin = priceMin;
+    }
+
+    public Double getPriceMax() {
+        return priceMax;
+    }
+
+    public void setPriceMax(Double priceMax) {
+        this.priceMax = priceMax;
+    }
+
+    public String getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(String platform) {
+        this.platform = platform;
+    }
+
+    public String getPriceSort() {
+        return priceSort;
+    }
+
+    public void setPriceSort(String priceSort) {
+        this.priceSort = priceSort;
+    }
 }
+
 
 class ProductHistoryRequest {
 

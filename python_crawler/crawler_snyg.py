@@ -136,16 +136,16 @@ def check_product_exists(conn, shop_url):
         return None
 
 # 插入新的商品
-def insert_product(conn, name, category, shop_url, img_path):
+def insert_product(conn, name, category, shop_url, img_path, latest_price):
     cursor = conn.cursor()
     created_at = datetime.now()
     query = """
-        INSERT INTO product (name, category, platform, created_at, shop_url, img)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        INSERT INTO product (name, category, platform, created_at, shop_url, img, latest_price)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
     """
     with open(img_path, 'rb') as img_file:
         img_blob = img_file.read()
-        cursor.execute(query, (name, category, '苏宁易购', created_at, shop_url, img_blob))
+        cursor.execute(query, (name, category, '苏宁易购', created_at, shop_url, img_blob, latest_price))  # 传递 latest_price
         conn.commit()
         logging.info(f"成功插入商品: {name}，URL: {shop_url}")
         return cursor.lastrowid  # 返回插入商品的ID
@@ -280,8 +280,17 @@ def process_product(conn, product_info):
     product_id = check_product_exists(conn, product_info['shop_url'])
 
     if product_id is None:
+        # 插入新的商品时，先处理价格
+        # 处理价格，去掉 "¥" 和 "," 等非数字字符
+        latest_price = product_info['price'].replace('¥', '').replace(',', '')  # 去除 "¥" 和 "," 符号
+        try:
+            latest_price = float(latest_price)  # 转换为浮动数值
+        except ValueError:
+            logging.warning(f"价格格式不正确: {product_info['price']}, 使用默认价格 0.0")
+            latest_price = 0.0  # 如果转换失败，使用默认价格 0.0
+
         # 插入新的商品
-        product_id = insert_product(conn, product_info['name'], product_info['category'], product_info['shop_url'], downloaded_image_path)
+        product_id = insert_product(conn, product_info['name'], product_info['category'], product_info['shop_url'], downloaded_image_path, latest_price)
 
     # 插入或更新价格历史
     if product_info['price'] != '无价格':

@@ -12,9 +12,7 @@ import com.zjubs.shopcompare.model.Product;
 import com.zjubs.shopcompare.repository.PriceHistoryRepository;
 import com.zjubs.shopcompare.repository.ProductRepository;
 import com.zjubs.shopcompare.util.EmailUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,18 +45,13 @@ public class PriceAlertService {
         priceAlert.setUserId(userId);
         priceAlert.setProductId(productId);
 
-        // 根据商品ID查找最新的价格历史记录
-        List<PriceHistory> latestPriceHistories = priceHistoryRepository.findTop1ByProductIdOrderByCreatedAtDesc(productId);
+        // 根据商品ID查找商品信息
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found for the given ID"));
 
-        if (latestPriceHistories != null && !latestPriceHistories.isEmpty()) {
-            // 获取列表中的第一个记录，即最新的价格
-            PriceHistory latestPriceHistory = latestPriceHistories.get(0);  // 获取最新的一条记录
-            double latestPrice = latestPriceHistory.getPrice();
-            priceAlert.setPriceThreshold(latestPrice);
-        } else {
-            // 如果没有找到价格历史记录，可以抛出异常或者设置默认值
-            throw new IllegalArgumentException("No price history found for the product");
-        }
+        // 获取商品的最新价格（从 Product 表中获取）
+        double latestPrice = product.getLatestPrice();
+        priceAlert.setPriceThreshold(latestPrice);
 
         // 将提醒记录保存到数据库
         return priceAlertRepository.save(priceAlert);

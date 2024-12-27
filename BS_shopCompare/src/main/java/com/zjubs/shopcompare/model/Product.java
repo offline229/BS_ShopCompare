@@ -15,16 +15,25 @@ public class Product {
     private String category;
     private String platform;
 
+
     @Column(name = "created_at")
     private Timestamp createdAt;
 
     private String shopUrl;
     private byte[] img;  // 图片是 BLOB 类型
-
-    @Transient  // 不是数据库字段，用于返回的最新价格
+    @Column(name = "latest_price")
     private double latestPrice;
 
+
     // getters and setters
+    public double getLatestPrice() {
+        return latestPrice;
+    }
+
+    public void setLatestPrice(int latest_price) {
+        this.latestPrice = latest_price;
+    }
+
 
     public int getId() {
         return id;
@@ -82,11 +91,4 @@ public class Product {
         this.img = img;
     }
 
-    public double getLatestPrice() {
-        return latestPrice;
-    }
-
-    public void setLatestPrice(double latestPrice) {
-        this.latestPrice = latestPrice;
-    }
 }

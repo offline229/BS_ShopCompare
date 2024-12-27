@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import {ref, onMounted, watch} from 'vue';
 import axios from 'axios';
 import ProductCard from '@/components/ProductCard.vue';
 import { useProductStore } from '@/stores/productStore';
@@ -45,11 +45,20 @@ const products = ref([]); // 商品数据
 // 向后端请求数据的函数（支持分页）
 const fetchProductData = async () => {
   try {
-    console.log("发送请求到后端");
-    console.log("itemsPerPage: ", itemsPerPage);
-    console.log("currentPage: ", currentPage);
+    console.log('Fetching products with filters:', {
+      searchQuery: productStore.searchQuery,
+      priceMin: productStore.priceMin,
+      priceMax: productStore.priceMax,
+      platform: productStore.platform,
+      priceSort: productStore.priceSort,
+    });
     // 向后端请求数据，带上分页参数
     const response = await axios.post('/api/products/shop_display', {
+      searchQuery: null,
+      priceMin: productStore.priceMin,
+      priceMax: productStore.priceMax,
+      platform: productStore.platform,
+      priceSort: productStore.priceSort,
       page: currentPage.value,
       limit: itemsPerPage.value
     });
@@ -94,6 +103,18 @@ const changePage = (page: number) => {
 onMounted(() => {
   fetchProductData(); // 加载第一页商品数据
 });
+
+// 监听筛选条件的变化，当发生变化时，重新获取商品数据
+watch(
+    [
+//      () => productStore.searchQuery,
+      () => productStore.priceMin,
+      () => productStore.priceMax,
+      () => productStore.platform,
+      () => productStore.priceSort,
+    ],
+    fetchProductData
+);
 </script>
 
 

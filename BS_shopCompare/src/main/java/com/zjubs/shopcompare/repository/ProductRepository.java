@@ -3,6 +3,7 @@ package com.zjubs.shopcompare.repository;
 import com.zjubs.shopcompare.model.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,6 +15,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
      * @param pageable 分页请求对象
      * @return 商品分页结果
      */
+    
     Page<Product> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     // 如果你需要支持按其他字段进行排序或过滤，可以扩展类似的方法
@@ -22,4 +24,10 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     // 例如按平台和类别过滤分页查询：
     Page<Product> findByPlatformAndCategoryOrderByCreatedAtDesc(String platform, String category, Pageable pageable);
+
+    // 默认分页查询方法
+    Page<Product> findAll(Pageable pageable);
+
+    // 使用 Specification 进行动态查询（已经由 JpaSpecificationExecutor 提供）
+    Page<Product> findAll(Specification<Product> spec, Pageable pageable);
 }
