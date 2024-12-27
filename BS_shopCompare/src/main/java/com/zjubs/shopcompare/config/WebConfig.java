@@ -11,7 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")  // 允许所有路径进行跨域
-                .allowedOrigins("http://localhost:5173")  // 允许的前端地址
+                .allowedOrigins("http://localhost:5173", "http://localhost:5000")   // 允许的前端地址
                 .allowedMethods("GET", "POST", "PUT", "DELETE")  // 允许的请求方法
                 .allowedHeaders("*")  // 允许所有请求头
                 .allowCredentials(true);  // 是否允许携带 cookies

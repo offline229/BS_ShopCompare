@@ -178,7 +178,7 @@ public class UserController {
     }
 
     // 删除提醒记录
-    @PostMapping("/delete_alert")
+    @DeleteMapping("/delete_alert")
     public ResponseEntity<String> deleteAlert(@RequestBody DeleteAlertRequest request) {
         int id = request.getId();
 

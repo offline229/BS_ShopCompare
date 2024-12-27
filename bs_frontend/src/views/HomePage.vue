@@ -57,7 +57,6 @@ const closeChartModal = () => {
           <ShopDisplay />
         </div>
 
-        <button @click="handleDetail">查看图表</button>
 
         <!-- 使用 ChartModal 组件 -->
         <ChartModal

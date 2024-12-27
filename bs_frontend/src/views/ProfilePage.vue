@@ -80,7 +80,7 @@ const fetchAlerts = async () => {
 // 取消提醒
 const cancelAlert = async (alertId: number) => {
   try {
-    const response = await axios.delete(`/api/alerts/${alertId}`, {
+    const response = await axios.delete(`/api/users/delete_alert`, {
       data: { userId }
     });
     if (response.data.success) {
