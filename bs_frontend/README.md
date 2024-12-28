@@ -9,11 +9,14 @@ store 文件下的index.js文件存储静态变量信息
 
 component 存放组件
 
+bs_frontend/src/main.ts
+存放前端项目端口
+
+
 ## Project Setup
 
 ```sh
 npm install
-npm install axios
 
 ```
 
@@ -28,3 +31,4 @@ npm run dev
 ```sh
 npm run build
 ```
+
