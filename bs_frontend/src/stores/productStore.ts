@@ -19,7 +19,7 @@ export const useProductStore = defineStore('product', () => {
     const priceSort = ref<'asc' | 'desc'>('asc');  // 价格排序，默认为升序（'asc'）
 
     // 新增状态：是否启动本地搜索的 flag
-    const isLocalSearchEnabled = ref<boolean>(true);  // 默认为 false，表示不启动本地搜索
+    const isLocalSearchEnabled = ref<boolean>(true);  // 默认为启动本地搜索
 
     // 更新当前商品 ID 的方法
     const updateCurrentProductId = (id: number) => {

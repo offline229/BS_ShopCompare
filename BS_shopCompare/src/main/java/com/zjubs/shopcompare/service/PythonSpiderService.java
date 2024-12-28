@@ -20,7 +20,7 @@ public class PythonSpiderService {
     }
 
     public String callPythonSpider(String keyword) {
-        String url = "http://localhost:5000/crawl";  // Flask 服务的 URL
+        String url = "http://localhost:8080/crawl";  // Flask 服务的 URL
 
         // 构建请求头，指定 Content-Type 为 application/json
         HttpHeaders headers = new HttpHeaders();

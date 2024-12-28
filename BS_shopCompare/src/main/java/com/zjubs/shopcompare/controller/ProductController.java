@@ -200,9 +200,10 @@ class ProductRequest {
         return isLocalSearchEnabled;
     }
 
-    public void setIsLocalSearchEnabled(boolean priceSort) {
+    public void setIsLocalSearchEnabled(boolean isLocalSearchEnabled) {
         this.isLocalSearchEnabled = isLocalSearchEnabled;
     }
+
 
 }
 

@@ -30,4 +30,4 @@ def crawl():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)  # 运行在5000端口
+    app.run(debug=True, port=8080)  # 端口号，确保这里没被占用

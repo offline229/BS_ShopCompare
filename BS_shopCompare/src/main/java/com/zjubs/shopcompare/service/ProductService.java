@@ -88,7 +88,7 @@ public class ProductService {
         System.out.println("Final Sort: " + sort);
 
         // 创建分页请求对象，包含排序条件
-        Pageable pageableRequest = PageRequest.of(page, size, sort);
+        Pageable pageableRequest = PageRequest.of(page-1, size, sort);
         System.out.println("Created Pageable: " + pageableRequest);
 
         // 使用 Specification 和分页查询商品数据
