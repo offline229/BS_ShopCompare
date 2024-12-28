@@ -61,13 +61,13 @@ const closeChartModal = () => {
         <!-- 使用 ChartModal 组件 -->
         <ChartModal
             :show="productStore.showChartModal"
-            :onClose="closeChartModal"
+            @close="closeChartModal"
         />
 
         <!-- 使用 ClockModal 组件 -->
         <ClockModal
             :show="productStore.showClockModal"
-            :onClose="closeClockModal"
+            @close="closeClockModal"
         />
       </div>
     </div>
@@ -84,7 +84,7 @@ const closeChartModal = () => {
 .content {
   display: flex;
   flex-grow: 1;
-  margin-top: 60px; /* 为了避免与 TopBar 重叠，留出顶部空间 */
+  margin-top: 40px; /* 为了避免与 TopBar 重叠，留出顶部空间 */
   width: 100%;
 }
 

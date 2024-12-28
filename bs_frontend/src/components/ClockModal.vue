@@ -28,7 +28,7 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
-  onClose: {
+  closeChartModal: {
     type: Function,
     required: true,
   },
@@ -44,7 +44,7 @@ const setAlarm = async () => {
         productId: currentProductId.value,
       });
 
-      alert('定时提醒设置成功');
+      // alert('定时提醒设置成功');
       closeModal();  // 关闭弹窗
     } else {
       alert('用户ID无效');
@@ -53,10 +53,10 @@ const setAlarm = async () => {
     console.error('设置定时提醒失败:', error);
   }
 };
-
+const emit = defineEmits(['close']);
 // 关闭弹窗
 const closeModal = () => {
-  props.onClose(); // 调用父组件的关闭函数
+  emit('close');  // 触发父组件传递的 close 事件
 };
 </script>
 

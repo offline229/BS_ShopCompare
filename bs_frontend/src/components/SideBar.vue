@@ -12,21 +12,21 @@
     <!-- 价格排序 -->
     <div class="category">
       <h3 class="category-title">价格排序</h3>
-      <button @click="togglePriceSort">{{ localPriceSort === 'asc' ? '升序' : '降序' }}</button>
+      <button @click="togglePriceSort">{{ productStore.priceSort === 'asc' ? '升序' : '降序' }}</button>
     </div>
 
     <!-- 平台选择 -->
     <div class="category">
       <h3 class="category-title">平台选择</h3>
-      <select v-model="localPlatform">
+      <select v-model="productStore.platform">
         <option value="苏宁易购">苏宁易购</option>
-        <option value="尚兴">尚兴</option>
+        <option value="当当网">当当网</option>
       </select>
     </div>
 
     <!-- 启用本地搜索模式切换按钮 -->
     <div class="category">
-      <button @click="toggleLocalSearch">{{ localSearchButtonText }}</button>
+      <button @click="toggleLocalSearch">{{ productStore.isLocalSearchEnabled ? '本地搜索模式' : '爬虫搜索模式' }}</button>
     </div>
 
     <!-- 确定筛选按钮 -->
@@ -36,21 +36,18 @@
   </aside>
 </template>
 
+
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { useProductStore } from '@/stores/productStore';
-
-const productStore = useProductStore();
-
-// 本地状态变量
+// 本地状态变量（仅针对价格筛选）
 const localPriceMin = ref<number | null>(null);
 const localPriceMax = ref<number | null>(null);
-const localPriceSort = ref<'asc' | 'desc'>('asc'); // 默认升序
-const localPlatform = ref<string>('苏宁易购');
+const productStore = useProductStore();
 
 // 切换价格排序
 const togglePriceSort = () => {
-  localPriceSort.value = localPriceSort.value === 'asc' ? 'desc' : 'asc';
+  productStore.updatePriceSort(productStore.priceSort === 'asc' ? 'desc' : 'asc');
 };
 
 // 切换本地搜索模式
@@ -58,23 +55,14 @@ const toggleLocalSearch = () => {
   productStore.toggleLocalSearch(!productStore.isLocalSearchEnabled);
 };
 
-// 获取本地搜索按钮的文本
-const localSearchButtonText = computed(() => {
-  return productStore.isLocalSearchEnabled ? '爬虫搜索模式' : '本地搜索模式';
-});
-
 // 更新筛选条件到 store
 const applyFilters = () => {
-  // 将本地变量更新到 Pinia store 中
+  // 更新筛选条件到 Pinia store
   if (localPriceMin.value !== null) productStore.updatePriceMin(localPriceMin.value);
   if (localPriceMax.value !== null) productStore.updatePriceMax(localPriceMax.value);
-  productStore.updatePriceSort(localPriceSort.value);
-  productStore.updatePlatform(localPlatform.value);
-
-  // 如果需要更新分页或其他筛选项，可以在这里进行
-  // productStore.updateCurrentPage(1);  // 默认从第一页开始
 };
 </script>
+
 
 <style scoped>
 .sidebar {

@@ -3,7 +3,6 @@ import logging
 import mysql.connector
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
 from datetime import datetime
 from mysql.connector import Error
 from PIL import Image
@@ -145,7 +144,7 @@ def insert_product(conn, name, category, shop_url, img_path, latest_price):
     """
     with open(img_path, 'rb') as img_file:
         img_blob = img_file.read()
-        cursor.execute(query, (name, category, '苏宁易购', created_at, shop_url, img_blob, latest_price))  # 传递 latest_price
+        cursor.execute(query, (name, category, '当当网', created_at, shop_url, img_blob, latest_price))  # 修改平台为当当网
         conn.commit()
         logging.info(f"成功插入商品: {name}，URL: {shop_url}")
         return cursor.lastrowid  # 返回插入商品的ID
@@ -177,9 +176,12 @@ def handle_price_history(conn, product_id, new_price):
         logging.info(f"无历史价格记录，插入新价格记录: {new_price}")
         insert_price_history(conn, product_id, new_price)
 
-# 爬取苏宁易购商品
+# 爬取当当网商品
+import re
+
 def fetch_product_details(keyword):
-    base_url = f"https://search.suning.com/{keyword}/"
+    # 使用当当网的搜索 URL
+    base_url = f"https://search.dangdang.com/?key={keyword}&act=input"
     driver = get_driver()
 
     try:
@@ -191,15 +193,16 @@ def fetch_product_details(keyword):
 
         # 执行滚动操作，模拟用户浏览更多商品
         body = driver.find_element(By.TAG_NAME, 'body')
-        for _ in range(5):  # 滚动三次
+        for _ in range(5):  # 滚动五次
             body.send_keys(Keys.PAGE_DOWN)
             time.sleep(2)
 
         # 获取页面的 HTML 内容
         soup = BeautifulSoup(driver.page_source, 'html.parser')
+        print(soup.prettify())
 
-        # 找到商品列表，按 class="item-wrap" 筛选
-        products = soup.find_all('li', class_='item-wrap')
+        # 使用正则表达式匹配所有以 'line' 开头的类名
+        products = soup.find_all('li', class_=re.compile(r'line\d+'))
 
         if not products:
             logging.warning("没有找到商品信息")
@@ -210,45 +213,25 @@ def fetch_product_details(keyword):
 
         for i, product in enumerate(products):
             # 获取商品标题
-            title_tag = product.find('div', class_='title-selling-point')
+            title_tag = product.find('p', class_='name')
             title = title_tag.get_text(strip=True) if title_tag else '无标题'
 
             # 获取商品价格
-            price_tag = product.find('span', class_='def-price')
+            price_tag = product.find('p', class_='price')
             price = price_tag.get_text(strip=True) if price_tag else '无价格'
 
             # 如果价格为空，跳过当前商品
             if price == '':
                 logging.info(f"商品 {i + 1}: 标题 - {title}，跳过没有价格的商品")
                 continue
+
             # 获取商品图片链接
             img_tag = product.find('img')
             img_url = img_tag['src'] if img_tag else '无图片'
 
             # 获取商品详情页链接
-            detail_tag = product.find('a')
+            detail_tag = product.find('a', {'name': 'itemlist-title'})
             shop_url = urljoin(base_url, detail_tag['href']) if detail_tag else '无详情页链接'
-
-            # 如果 shop_url 是类似 https://th.suning.com/calCpcClicks? 的链接，进行处理
-            if 'calCpcClicks' in shop_url:
-                # 解析 URL，提取 clickUrl 参数
-                parsed_url = urlparse(shop_url)
-                query_params = parse_qs(parsed_url.query)
-                click_url = query_params.get('clickUrl', [None])[0]
-
-                if click_url:
-                    # 进一步解析 click_url 以提取最终商品页面的 URL
-                    parsed_click_url = urlparse(click_url)
-                    # 从 click_url 中提取商品 ID
-                    path_parts = parsed_click_url.path.split('/')
-                    if len(path_parts) >= 3:
-                        product_id = path_parts[1]
-                        item_code = path_parts[2].replace('.html', '')  # 去掉 .html 部分
-                        shop_url = f"https://product.suning.com/{product_id}/{item_code}.html"
-                    else:
-                        shop_url = '无有效详情页链接'
-                else:
-                    shop_url = '无 clickUrl 参数'
 
             product_data.append({
                 'name': title,
@@ -264,6 +247,18 @@ def fetch_product_details(keyword):
 
     finally:
         driver.quit()
+
+# 插入新的商品时，先处理价格
+def process_price(price_str):
+    # 使用正则表达式提取出第一个出现的带"¥"符号的价格
+    match = re.search(r'¥\s*(\d+(\.\d{1,2})?)', price_str)
+
+    if match:
+        return float(match.group(1))  # 提取并转换为浮动数值
+    else:
+        logging.warning(f"无法提取有效价格: {price_str}")
+        return 0.0  # 如果没有找到有效价格，则返回默认价格 0.0
+
 
 # 处理商品信息和价格更新
 def process_product(conn, product_info):
@@ -281,8 +276,8 @@ def process_product(conn, product_info):
 
     if product_id is None:
         # 插入新的商品时，先处理价格
-        # 处理价格，去掉 "¥" 和 "," 等非数字字符
-        latest_price = product_info['price'].replace('¥', '').replace(',', '').replace('到手价', '')  # 去除 "¥", "," 和 "到手价"
+        latest_price = product_info['price'].replace('到手价', '').replace(',', '')  # 去除 "到手价" 和 ","
+        latest_price = process_price(latest_price)  # 调用处理价格的函数
         try:
             latest_price = float(latest_price)  # 转换为浮动数值
         except ValueError:
@@ -305,7 +300,7 @@ def process_product(conn, product_info):
     logging.info(f"删除本地图片: {downloaded_image_path}")
 
 # 新增的函数 '调用'
-def crawl_interface_snyg(keyword):
+def crawl_interface_dd(keyword):
     # 连接数据库
     conn = connect_db()
     if conn is None:
@@ -338,8 +333,6 @@ def crawl_interface_snyg(keyword):
             conn.close()
             logging.info("数据库连接已关闭")
 
-
-
 if __name__ == '__main__':
     keyword = input("请输入商品关键词（例如: 猫粮）: ").strip()
-    crawl_interface_snyg((keyword))
+    crawl_interface_dd(keyword)

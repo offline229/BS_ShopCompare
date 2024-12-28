@@ -32,11 +32,22 @@ public class PythonSpiderService {
         HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
 
         // 发送 POST 请求
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+        System.out.println("callPythonSpider: " + url);
+        try {
+            // 使用 RestTemplate 发送请求
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
-        // 输出响应
-        System.out.println(response.getBody());
-        return response.getBody();
+            // 打印响应的状态码和内容
+            System.out.println("Response Status: " + response.getStatusCode());
+            System.out.println("Response Body: " + response.getBody());
+
+            return response.getBody();
+        } catch (Exception e) {
+            // 捕获异常并输出详细信息
+            System.err.println("Error occurred while calling Python Spider API: " + e.getMessage());
+            e.printStackTrace();  // 打印堆栈信息
+            return null;
+        }
     }
 }

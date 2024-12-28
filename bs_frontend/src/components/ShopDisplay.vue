@@ -54,6 +54,8 @@ const fetchProductData = async () => {
       platform: productStore.platform,
       priceSort: productStore.priceSort,
       isLocalSearchEnabled : productStore.isLocalSearchEnabled,
+      currentPage : productStore.currentPage,
+      itemsPerPage : productStore.itemsPerPage,
     });
     // 向后端请求数据，带上分页参数
     const response = await axios.post('/api/products/shop_display', {
@@ -119,6 +121,7 @@ watch(
       () => productStore.priceMax,
       () => productStore.platform,
       () => productStore.priceSort,
+      () => productStore.isLocalSearchEnabled,
     ],
     fetchProductData
 );
@@ -127,7 +130,7 @@ watch(
 
 <style scoped>
 .shop-display {
-  padding: 20px;
+  padding: 10px;
 }
 
 .header {
@@ -158,7 +161,6 @@ watch(
   object-fit: contain; /* 确保图片不被裁剪 */
 }
 
-/* 分页按钮 */
 /* 分页按钮 */
 .pagination {
   display: flex;

@@ -57,9 +57,10 @@ const initChart = () => {
   }
 };
 
+const emit = defineEmits(['close']);
 // 关闭弹窗
 const closeModal = () => {
-  props.onClose(); // 调用父组件的关闭函数
+  emit('close');  // 触发父组件传递的 close 事件
 };
 
 // 监听 show 的变化，当弹窗打开时重新初始化图表
