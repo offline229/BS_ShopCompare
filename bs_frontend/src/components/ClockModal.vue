@@ -30,7 +30,7 @@ const props = defineProps({
   },
   closeChartModal: {
     type: Function,
-    required: true,
+    required: false,
   },
 });
 

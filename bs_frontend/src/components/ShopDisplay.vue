@@ -42,7 +42,20 @@ const totalPages = ref(1);    // 总页数
 const totalCount = ref(0);    // 总商品数量
 const searchCount = ref(0);   // 搜索结果数量
 
-const products = ref([]); // 商品数据
+// 定义商品类型接口
+interface Product {
+  id: number ;
+  name: string;
+  category: string;
+  latestPrice: number;
+  platform: string;
+  img: string | null;
+  shopUrl: string;
+}
+
+// 声明 `products` 数组类型为 `Product[]`
+const products = ref<Product[]>([]);  // 这里声明了 products 是一个 Product 类型的数组
+
 
 // 向后端请求数据的函数（支持分页）
 const fetchProductData = async () => {

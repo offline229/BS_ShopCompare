@@ -26,9 +26,8 @@
 
 <script setup lang="ts">
 import TopBar from '@/components/TopBar.vue';
-import Sidebar from '@/components/Sidebar.vue';
+import Sidebar from '@/components/SideBar.vue';
 import SearchBar from '@/components/SearchBar.vue';
-import LoginWindow from "@/components/LoginWindow.vue";
 import SearchHistory from "@/components/SearchHistory.vue"; // 引入商品展示组件
 </script>
 

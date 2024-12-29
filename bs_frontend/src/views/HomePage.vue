@@ -2,7 +2,7 @@
 import { ref, nextTick, watch } from 'vue';
 import { useProductStore } from '@/stores/productStore';
 import TopBar from '@/components/TopBar.vue';
-import Sidebar from '@/components/Sidebar.vue';
+import Sidebar from '@/components/SideBar.vue';
 import SearchBar from '@/components/SearchBar.vue';
 import ShopDisplay from '@/components/ShopDisplay.vue';
 import ChartModal from '@/components/ChartModal.vue';  // 引入图表弹窗组件

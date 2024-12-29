@@ -1,0 +1,57 @@
+version: '3.7'
+
+services:
+  frontend:
+    build:
+      context: .  # 使用当前目录作为构建上下文
+      dockerfile: bs_frontend/Dockerfile  # 指定前端的 Dockerfile
+    ports:
+      - "5173:80"  # 将容器的 80 端口映射到主机的 5173 端口
+    networks:
+      - shopcompare-network
+
+  backend:
+    build:
+      context: .  # 使用当前目录作为构建上下文
+      dockerfile: BS_shopCompare/Dockerfile  # 后端 Dockerfile 路径
+    ports:
+      - "8000:8000"  # 映射后端容器的 8000 端口到本地的 8000 端口
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/bs_shopcompare
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=64793416zhu
+    depends_on:
+      - db  # 后端依赖数据库服务
+    networks:
+      - shopcompare-network
+
+  db:
+    image: mysql:8
+    environment:
+      - MYSQL_ROOT_PASSWORD=64793416zhu
+      - MYSQL_DATABASE=bs_shopcompare
+    ports:
+      - "3306:3306"  # 映射数据库容器的 3306 端口到本机的 3306 端口
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - shopcompare-network
+
+  crawler:
+    build:
+      context: .  # 使用当前目录作为构建上下文
+      dockerfile: python_crawler/Dockerfile  # 爬虫 Dockerfile 路径
+    ports:
+      - "8080:8080"  # 映射爬虫容器的 8080 端口到本机的 8080 端口
+    depends_on:
+      - db  # 爬虫依赖数据库服务
+    networks:
+      - shopcompare-network
+    restart: always
+
+networks:
+  shopcompare-network:
+    driver: bridge
+
+volumes:
+  db-data:

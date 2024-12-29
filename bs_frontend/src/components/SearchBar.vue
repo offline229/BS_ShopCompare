@@ -41,7 +41,7 @@ const search = async () => {
     console.log("check " + currentPage + " " + itemsPerPage + "value");
     productStore.updatePagination(1,itemsPerPage);
   } else {
-    productStore.updateSearchQuery(null);
+    productStore.updateSearchQuery("");
   }
 };
 

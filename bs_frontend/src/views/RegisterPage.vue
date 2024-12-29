@@ -150,17 +150,22 @@ const sendCaptcha = async () => {
       // 其他情况，使用返回的 message 显示错误信息
       alert('验证码发送失败：' + response.data);
     }
-  } catch (error) {
+  } catch (error: unknown) {
+    // @ts-ignore
     if (error.response) {
       // 如果后端返回了响应数据，且状态码为400等
+      // @ts-ignore
       alert('请求失败: ' + error.response.data);  // 显示后端返回的错误信息
+      // @ts-ignore
     } else if (error.request) {
       // 如果请求没有响应，表示没有收到服务器的回应
       alert('请求失败: 网络错误');
     } else {
       // 其他错误
+      // @ts-ignore
       alert('请求失败: ' + error.message);
     }
+    // @ts-ignore
     console.error(error);
   }
 };
@@ -198,7 +203,8 @@ const handleSubmit = async () => {
 
     alert(response.data);  // 如果成功，显示 "注册成功"
     router.push('/');  // 跳转到登录页面或首页
-  } catch (error) {
+  } catch (error: unknown) {
+    // @ts-ignore
     alert('注册失败: ' + error.response.data);
   }
 };

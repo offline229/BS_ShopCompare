@@ -39,7 +39,7 @@ const props = defineProps({
     type: Object,
     required: true,
     default: () => ({
-      id: null,              // 商品ID
+      id: 1,              // 商品ID
       name: '蓝牙音响',       // 商品名称
       category: '音响设备',    // 商品分类
       latestPrice: 299,      // 商品价格
@@ -77,14 +77,15 @@ const openChartModal = () => {
 };
 
 // 商品图片的 Blob 数据 URL
-const productImageUrl = ref<string | null>(null);
+const productImageUrl = ref<string | undefined>(undefined);
 const defaultImage = '@/assets/seperate.png';  // 默认图片路径
 
 // 监听商品数据变化，重新处理图片
 watch(() => props.product, (newProduct) => {
   if (newProduct.img) {
     const byteCharacters = atob(newProduct.img);  // 解码 Base64 字符串
-    const byteArrays = [];
+
+    const byteArrays: Uint8Array[] = [];
     for (let offset = 0; offset < byteCharacters.length; offset += 512) {
       const slice = byteCharacters.slice(offset, offset + 512);
       const byteNumbers = new Array(slice.length);
