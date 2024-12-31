@@ -116,7 +116,6 @@ public class UserController {
         if (storedCaptcha == null || !storedCaptcha.equals(captcha)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("验证码无效或已过期");
         }
-        // 假设验证码正确，进行注册逻辑（这里只是简单打印，实际可以在数据库中保存用户信息）
         redisService.deleteCaptcha(email);
 
         User newUser = new User();

@@ -12,7 +12,7 @@ public class RedisService {
 
     // 存储验证码
     public void saveCaptcha(String email, String captcha) {
-        // 存储验证码，并设置 5 分钟有效期（你可以根据需要修改有效期）
+        // 存储验证码，并设置 5 分钟有效期
         redisTemplate.opsForValue().set(email, captcha, 5, TimeUnit.MINUTES);
     }
 

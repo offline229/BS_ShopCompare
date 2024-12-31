@@ -53,8 +53,7 @@ interface Product {
   shopUrl: string;
 }
 
-// 声明 `products` 数组类型为 `Product[]`
-const products = ref<Product[]>([]);  // 这里声明了 products 是一个 Product 类型的数组
+const products = ref<Product[]>([]);
 
 
 // 向后端请求数据的函数（支持分页）
@@ -82,8 +81,6 @@ const fetchProductData = async () => {
       isLocalSearchEnabled : productStore.isLocalSearchEnabled
     });
 
-    // 假设后端返回的数据结构类似：
-    // { products: [...], totalCount: 100 }
     const productsData = response.data.products;  // 获取商品列表
     const totalItems = response.data.totalCount;  // 获取总商品数量
     const searchItems = response.data.searchCount;
@@ -102,7 +99,6 @@ const fetchProductData = async () => {
     console.log("Total pages: ", totalPages.value);
   } catch (error) {
     console.error('请求失败:', error);
-    // 如果请求失败，保持默认商品数据
     products.value = [];
     totalCount.value = 0;
     searchCount.value = 0;

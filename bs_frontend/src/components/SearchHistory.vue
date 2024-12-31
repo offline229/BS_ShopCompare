@@ -46,7 +46,6 @@ const priceMax = ref(1000);
 // 向后端请求数据的函数
 const fetchProductHistory = async () => {
   try {
-    // 模拟请求用户历史记录 API（替换为实际的后端接口）
     const response = await axios.get('/api/products', {
       params: {
         priceMin: priceMin.value,

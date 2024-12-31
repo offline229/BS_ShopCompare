@@ -23,7 +23,6 @@ const productStore = useProductStore();
 // 本地的 searchQuery
 const localSearchQuery = ref(productStore.searchQuery);
 
-// 路由实例，用于路由跳转（如果需要）
 const router = useRouter();
 
 // 搜索操作
@@ -87,7 +86,7 @@ const onInput = () => {
 }
 
 .search-button img {
-  margin-right: 8px;  /* 如果有图标，文字和图标之间添加一些间距 */
+  margin-right: 8px;
 }
 
 
