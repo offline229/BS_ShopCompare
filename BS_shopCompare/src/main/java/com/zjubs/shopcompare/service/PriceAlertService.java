@@ -59,7 +59,7 @@ public class PriceAlertService {
     // 定时任务：每隔一段时间检查价格提醒
     @Scheduled(fixedRate = 3600000) // 执行的时间间隔，单位ms
     public void checkPriceAlerts() {
-        System.out.println("开始定时检查");
+        System.out.println("自动定时检查");
         // 获取所有未处理的价格提醒
         List<PriceAlert> priceAlerts = priceAlertRepository.findAll();
 

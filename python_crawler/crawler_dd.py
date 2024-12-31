@@ -189,13 +189,13 @@ def fetch_product_details(keyword):
         driver.get(base_url)
 
         # 等待页面加载
-        time.sleep(3)  # 等待页面加载
+        time.sleep(2)  # 等待页面加载
 
         # 执行滚动操作，模拟用户浏览更多商品
         body = driver.find_element(By.TAG_NAME, 'body')
-        for _ in range(5):  # 滚动五次
+        for _ in range(3):  # 滚动五次
             body.send_keys(Keys.PAGE_DOWN)
-            time.sleep(2)
+            time.sleep(1)
 
         # 获取页面的 HTML 内容
         soup = BeautifulSoup(driver.page_source, 'html.parser')

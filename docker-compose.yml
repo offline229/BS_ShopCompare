@@ -20,8 +20,11 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/bs_shopcompare
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=64793416zhu
+      - SPRING_REDIS_HOST=redis  # Redis 服务名
+      - SPRING_REDIS_PORT=6379
     depends_on:
       - db  # 后端依赖数据库服务
+      - redis  # 后端依赖 Redis 服务
     networks:
       - shopcompare-network
 
@@ -33,9 +36,18 @@ services:
     ports:
       - "3306:3306"  # 映射数据库容器的 3306 端口到本机的 3306 端口
     volumes:
-      - db-data:/var/lib/mysql
+      - bs_db-data:/var/lib/mysql
+      - ./data_test/bs_shopcompare_backup.sql:/docker-entrypoint-initdb.d/bs_shopcompare_backup.sql
     networks:
       - shopcompare-network
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - shopcompare-network
+
 
   crawler:
     build:
@@ -54,4 +66,4 @@ networks:
     driver: bridge
 
 volumes:
-  db-data:
+  bs_db-data:
